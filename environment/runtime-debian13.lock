@@ -1,0 +1,17 @@
+ffmpeg=7:7.1.5-0+deb13u1
+imagemagick=8:7.1.1.43+dfsg1-1+deb13u11
+libatomic1=14.2.0-19
+libgl1-mesa-dri=25.0.7-2+deb13u1
+libglib2.0-0t64=2.84.4-3~deb13u5
+libglx-mesa0=25.0.7-2+deb13u1
+libmpeg2-4=0.5.1-9+b3
+libopenal1=1:1.24.2-1
+libpng16-16t64=1.6.48-1+deb13u5
+libsdl2-2.0-0=2.32.4+dfsg-1
+libstdc++6=14.2.0-19
+libxfont2=1:2.0.6-1+deb13u1
+libxkbfile1=1:1.1.0-1+b4
+python3=3.13.5-1
+python3-pil=11.1.0-5+deb13u4
+x11-utils=7.7+7
+libicu76=76.1-4

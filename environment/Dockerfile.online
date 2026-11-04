@@ -1,0 +1,9 @@
+# Local validation container, not a published Codex environment.
+FROM debian:13-slim@sha256:f6b08b09a05725f9431502d3b5714f5c4576e82c1a84fa1debe0c24a7e0c3ec4
+COPY source/environment/runtime-debian13.lock /tmp/runtime.lock
+RUN apt-get update && xargs apt-get install -y --no-install-recommends < /tmp/runtime.lock && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/SmallMig
+COPY source/ ./
+COPY downloads/ .tools/downloads/
+RUN python3 environment/setup.py
+CMD ["python3", "environment/startup_check.py", "--emulators"]

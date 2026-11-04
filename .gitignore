@@ -1,0 +1,22 @@
+# Private firmware, runtime tools, generated disks and local evidence
+.tools/
+build/
+evidence/*
+!evidence/.gitkeep
+__pycache__/
+*.py[cod]
+*.rom
+*.adf
+*.hdf
+*.deb
+*.AppImage
+*.exe
+.env
+.env.*
+.DS_Store
+environment/docker-context/
+environment/docker-config/
+*.nes
+*.chr
+*.key
+*.pem

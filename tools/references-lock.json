@@ -1,0 +1,34 @@
+[
+  {
+    "name": "nesrecomp",
+    "url": "https://github.com/mstan/nesrecomp.git",
+    "revision": "e8091c8dd149f64ee3bd3489d00c011c50100f09",
+    "commit_date": "2026-10-31",
+    "verification": "source inspection only; no build or execution"
+  },
+  {
+    "name": "nes-recompiled",
+    "url": "https://github.com/SeppoPakonen/nes-recompiled.git",
+    "revision": "5da2bf9d4b304d90c25e5e0b4e52e755fa4aa357",
+    "commit_date": "2026-03-19",
+    "verification": "source inspection only; no build or execution"
+  },
+  {
+    "name": "6502to68k.py",
+    "url": "https://github.com/johnshawler/amiga68ktools",
+    "revision": "53bb88dfae081ca3d8f0c8d8afc43609d990ef0e",
+    "source_path": "tools/6502to68k.py",
+    "sha256": "4669b084b37413da6d336f02038a5e8d380320d0055eecd71097ab208138f6b8",
+    "verification": "source inspection only; no execution"
+  },
+  {
+    "name": "Mesen 2.1.1",
+    "url": "https://github.com/SourMesen/Mesen2",
+    "revision": "137ae7ce3bf3f539d007e2c4ef3cb3b6c97672a1",
+    "tag": "2.1.1",
+    "license": "GPL-3.0; upstream LICENSE and bundled-component notices retained in source checkout",
+    "binary_url": "https://github.com/SourMesen/Mesen2/releases/download/2.1.1/Mesen_2.1.1_Linux_x64.zip",
+    "binary_sha256": "7a9947575cc198209f743fef83fb2b702b786ea705506bdf3f2aea01ab7c1ce9",
+    "verification": "Official binary digest verified; actual headless ROM execution passed 240 frames and 180 movement calls; host libstdc++.so.6 preload workaround recorded."
+  }
+]
