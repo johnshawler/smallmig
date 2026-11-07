@@ -25,7 +25,11 @@
 #define AR_MAX_REGIONS 240          /* one region per line at most */
 #define AR_MAX_PAL     16
 #define AR_MAX_CFG     4           /* persistent background bitmaps (one per BG CHR bank / mirroring configuration), LRU */
-#define AR_BROW        96          /* bytes per bitmap row: 64 (512 pixels) + 32 guard bytes = copy of bytes 0..31: the 17-word window of the display reads up to byte 95 */
+#ifdef AR2_FETCH32
+#define AR_BROW        104         /* 64 bitmap bytes + 40 wrap bytes for extended fine scrolling */
+#else
+#define AR_BROW        96          /* 64 bitmap bytes + 32 wrap bytes */
+#endif
 #define AR_BROWS       512         /* rows per bitmap: 4 logical nametables x 256 (32 tile rows of 8) */
 
 /* a run of whole lines [y0,y1] drawn from the same configuration; line y0 starts with v = vl (coarse X/Y, nametable, fine Y: bits as the PPU's v register),

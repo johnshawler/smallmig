@@ -9,11 +9,11 @@
 #ifdef AR2_FETCH32
 #define AR2_FMODE 1
 #define AR2_DDF_START 0x30
-#define AR2_DDF_STOP 0xB0
+#define AR2_DDF_STOP 0xC0
 #define AR2_FETCH_PIXELS 32
 #define AR2_FETCH_SHIFT 5
 #define AR2_PAD_BYTES 4
-#define AR2_FETCH_BYTES 36
+#define AR2_FETCH_BYTES 40
 #else
 #define AR2_FMODE 0
 #define AR2_DDF_START 0x40

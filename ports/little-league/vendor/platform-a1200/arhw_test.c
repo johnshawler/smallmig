@@ -7,7 +7,7 @@
 #include "../runtime/arender.h"
 #include "display_ar2.h"
 
-#define BROW 96
+#define BROW AR_BROW
 #define NCFG 2
 static uint8_t bmp[NCFG * 4 * 512 * BROW] __attribute__((aligned(4), section(".chipbuf")));
 static uint8_t spr[4 * 240 * 32 + 4] __attribute__((aligned(4), section(".chipbuf")));
@@ -29,7 +29,7 @@ void arhw_test_main(void)
     display_init();
     for (unsigned c = 0; c < NCFG; c++) for (unsigned r = 0; r < 512; r++) {
         for (unsigned x = 0; x < 512; x++) { unsigned v = bgv(c, r, x); for (unsigned k = 0; k < 4; k++) put(bmp + ((c * 4 + k) * 512 + r) * BROW, x, (v >> k) & 1); }
-        for (unsigned k = 0; k < 4; k++) { uint8_t *row = bmp + ((c * 4 + k) * 512 + r) * BROW; for (unsigned i = 0; i < 32; i++) row[64 + i] = row[i]; }
+        for (unsigned k = 0; k < 4; k++) { uint8_t *row = bmp + ((c * 4 + k) * 512 + r) * BROW; for (unsigned i = 0; i < BROW-64; i++) row[64 + i] = row[i]; }
     }
     for (unsigned y = 0; y < 240; y++) for (unsigned x = 0; x < 256; x++) {
         unsigned s = spv(y, x), a = x1v(y, x), b = x2v(y, x);

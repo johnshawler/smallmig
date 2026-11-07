@@ -79,12 +79,12 @@ static __attribute__((noinline)) void ensure_trow(Nes*n,int c,int nt,int cy){
             if(pm==0xFF){ uint8_t p0=0,p1=0,p2=0,p3=0; const uint8_t*t=chr+ti*16; for(int fy=0;fy<8;fy++){ uint8_t a=t[fy], b=t[fy+8]; p0|=(uint8_t)~(a|b); p1|=(uint8_t)(a&~b); p2|=(uint8_t)(~a&b); p3|=(uint8_t)(a&b); }
                 g->pm[ti]=(uint8_t)((p0?1:0)|(p1?2:0)|(p2?4:0)|(p3?8:0)); } }
         for(int gp=0;gp<8;gp++){ dl[gp]=sl[gp]; da[gp]=atp[gp]; }
-        int two=(nx==0);
+        unsigned guard = nx ? (AR_BROW-96)/4 : 8;
         for(int fy=0;fy<8;fy++){
             for(int x=0;x<32;x++){ b0[x]=tp[x][fy]; b1[x]=tp[x][fy+8]; }
             uint32_t*c0=(uint32_t*)(row0+fy*AR_BROW),*c1=(uint32_t*)(row0+PS+fy*AR_BROW),*c2=(uint32_t*)(row0+2*PS+fy*AR_BROW),*c3=(uint32_t*)(row0+3*PS+fy*AR_BROW);
             for(int l=0;l<8;l++){ c0[l]=b0l[l]; c1[l]=b1l[l]; c2[l]=b2l[l]; c3[l]=b3l[l]; }
-            if(two) for(int l=0;l<8;l++){ c0[16+l]=b0l[l]; c1[16+l]=b1l[l]; c2[16+l]=b2l[l]; c3[16+l]=b3l[l]; }
+            for(unsigned l=0;l<guard;l++){ c0[16+l]=b0l[l]; c1[16+l]=b1l[l]; c2[16+l]=b2l[l]; c3[16+l]=b3l[l]; }
         }
         ar_st_tiles+=32; g->gen++;
         um=0; for(int x=0;x<32;x++){ unsigned pb=sh[x]>>8, pm=g->pm[sh[x]&255]; um|=(uint16_t)((pm&1)|((pm>>1)<<(4*pb+1))); }
@@ -105,7 +105,7 @@ static __attribute__((noinline)) void ensure_trow(Nes*n,int c,int nt,int cy){
             uint8_t*d0=row0+x, *d1=d0+PS, *d2=d1+PS, *d3=d2+PS;
             const uint8_t*ot=chr+(ov&255)*16; unsigned opb=ov>>8;         /* only the bytes that differ from what the bitmap holds are written (chip RAM writes are slow) */
             int w01=fresh, w2=fresh||((opb^pb)&1), w3=fresh||((opb^pb)&2);
-            int two=(nx*32+x<32);
+            int two=(nx*32+x<AR_BROW-64);
             for(int fy=0;fy<8;fy++){ unsigned o=fy*AR_BROW;
                 if(w01 || ot[fy]!=t[fy]){ d0[o]=t[fy]; if(two) d0[o+64]=t[fy]; }
                 if(w01 || ot[fy+8]!=t[fy+8]){ d1[o]=t[fy+8]; if(two) d1[o+64]=t[fy+8]; }
