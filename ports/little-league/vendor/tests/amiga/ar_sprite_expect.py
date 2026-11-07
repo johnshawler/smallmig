@@ -25,6 +25,7 @@ def picture(frame):
     bg=(pal*4+p).astype(np.uint8)
     bg[(p==0)|(xx<8)]=0
     result=bg.copy()
+    layer=np.zeros_like(bg);layer[:,:8]=4
     height=16 if large else 8
     for y in range(1,240):
         # Select before looking at tile transparency or horizontal clipping.
@@ -49,24 +50,26 @@ def picture(frame):
                 claimed[x]=True
                 if not (at&0x20 and (bg[y,x]&3)):
                     result[y,x]=16+(at&3)*4+sc
-    return result
+                    layer[y,x]=(at&3)*4+sc
+    return result,layer
 
 
 def main():
     shot,observed=sys.argv[1:3]
     h=2166136261
     for frame in range(64):
-        final=picture(frame)
-        for b in final.tobytes():h=((h^b)*16777619)&0xffffffff
+        final,layer=picture(frame)
+        for k in range(4):
+            for b in np.packbits((layer>>k)&1,axis=1,bitorder='big').tobytes():h=((h^b)*16777619)&0xffffffff
     if h!=int(observed):
-        raise SystemExit(f'All-frame index mismatch: expected {h:08x}, got {int(observed):08x}')
+        raise SystemExit(f'All-frame sprite-plane mismatch: expected {h:08x}, got {int(observed):08x}')
     colours=np.array(gen_palette.table(),dtype=np.uint32)
     rgb=colours[(final.astype(np.uint32)*7+3)&63]
     image=np.asarray(Image.open(shot).convert('RGB')).astype(np.uint32)
     im=image[52:532:2,138:650:2]
     got=(im[:,:,0]<<16)|(im[:,:,1]<<8)|im[:,:,2]
     bad=rgb!=got
-    print(f'{shot}: {int(bad.sum())} pixels differ; all 64 native frame hashes match')
+    print(f'{shot}: {int(bad.sum())} pixels differ; all 64 native sprite-plane hashes match')
     if bad.any():
         print('First differing coordinates:',np.argwhere(bad)[:16].tolist())
         raise SystemExit(1)

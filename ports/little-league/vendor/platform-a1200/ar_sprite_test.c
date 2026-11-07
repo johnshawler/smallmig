@@ -6,7 +6,7 @@
 #include "display.h"
 #include "../runtime/arender.h"
 static Nes n;
-static uint8_t chr[8192], expanded[240*256];
+static uint8_t chr[8192];
 static int8_t wave[128] __attribute__((aligned(4),section(".chipbuf")));
 extern uint32_t ar_sprite_cache_stats[4];
 static uint32_t hash=2166136261u;
@@ -29,6 +29,7 @@ static void prepare(unsigned frame,ArRegion *r)
 }
 void ar_sprite_test_main(void)
 {
+    word(6,0x1000);
     n.map.chr=chr;n.map.mirror=2;
     for(unsigned bank=0;bank<2;bank++)for(unsigned tile=0;tile<256;tile++)for(unsigned y=0;y<8;y++)for(unsigned x=0;x<8;x++){
         unsigned v=tile?((x+3*y+tile+bank)&3):0;
@@ -36,12 +37,14 @@ void ar_sprite_test_main(void)
     }
     for(unsigned i=0;i<2048;i++)n.ppu.nt[i]=(i%1024<960)?i%15+1:0xe4;
     display_init();ar_init();
+    word(6,0x1001);
     ArRegion r={0};
     /* Prewarm both buffers outside the timed window, including pattern banks. */
     for(unsigned f=0;f<32;f++){
         plat_wait_vbl();prepare(f,&r);ar_begin_frame(&n);ar_log_region(&n,&r);ar_end_frame(&n,&ar_out);
         while(!display_frame(0,0))plat_wait_vbl();
     }
+    word(6,0x1002);
     for(unsigned i=0;i<128;i++)wave[i]=(i&32)?32:-32;
     *(volatile uint32_t*)0xdff0a0=(uint32_t)wave;
     *(volatile uint16_t*)0xdff0a4=64;*(volatile uint16_t*)0xdff0a6=124;
@@ -56,12 +59,13 @@ void ar_sprite_test_main(void)
          * Hashing is deliberately outside the renderer timing interval. */
         uint32_t elapsed=(uint16_t)(before-plat_eclock());
         if(plat_tick_count-tick>4){word(0x08,0xbad);for(;;){};}
-        ar_expand_hw(&ar_out,expanded);
-        for(unsigned i=0;i<sizeof expanded;i++)hash=(hash^expanded[i])*16777619u;
+        for(unsigned k=0;k<4;k++)for(unsigned y=0;y<240;y++)for(unsigned i=0;i<32;i++)
+            hash=(hash^AR_SPR(k,y)[i])*16777619u;
         before=plat_eclock();
         while(!display_frame(0,0))plat_wait_vbl();
         elapsed+=(uint16_t)(before-plat_eclock());
         sum+=elapsed;if(elapsed>maximum)maximum=elapsed;
+        if((f&15)==15)word(6,0x2000+f);
     }
     plat_wait_vbl();plat_wait_vbl();
     value(0x10,sum);value(0x14,maximum);value(0x18,hash);

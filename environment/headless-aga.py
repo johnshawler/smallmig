@@ -143,6 +143,7 @@ log_flush = 1
                     raise RuntimeError('FS-UAE exited before the Copper fixture was ready')
                 time.sleep(.25)
             else:
+                print(text[-6000:],flush=True)
                 raise RuntimeError('Copper fixture did not become ready within 120 seconds')
             ids=subprocess.check_output(['xdotool','search','--onlyvisible','--name','FS-UAE'],text=True).splitlines()
             if not ids:
@@ -160,11 +161,11 @@ log_flush = 1
                             return int(values[-1],16)
                         report={'variant':out.name,'pictures':64,'renderer_eclock_ticks':(value(0x10)<<16)|value(0x12),
                                 'max_renderer_eclock_ticks':(value(0x14)<<16)|value(0x16),
-                                'pixel_index_fnv32':(value(0x18)<<16)|value(0x1a),
+                                'planar_sprite_fnv32':(value(0x18)<<16)|value(0x1a),
                                 'cache':{k:(value(0x20+4*i)<<16)|value(0x22+4*i)
                                          for i,k in enumerate(['calls','hits','misses','oam_words'])},
                                 'full_game_speed_certified':False}
-                        run([sys.executable,SRC/'tests/amiga/ar_sprite_expect.py',files[-1],str(report['pixel_index_fnv32'])])
+                        run([sys.executable,SRC/'tests/amiga/ar_sprite_expect.py',files[-1],str(report['planar_sprite_fnv32'])])
                         (out/'result.json').write_text(json.dumps(report,indent=2)+'\n')
                         print(json.dumps(report),flush=True)
                         return
@@ -199,5 +200,5 @@ if __name__=='__main__':
             out=firmware(32,variant)
             run(['xvfb-run','-a','-s','-screen 0 1024x768x24',sys.executable,__file__,'--inside',out])
             results.append(json.loads((out/'result.json').read_text()))
-        assert len({r['pixel_index_fnv32'] for r in results})==1
+        assert len({r['planar_sprite_fnv32'] for r in results})==1
         print('Sprite path comparison: '+json.dumps(results),flush=True)
