@@ -25,6 +25,7 @@ static unsigned bus_ticks(void)
                                     0x20c1,0x51c8,0xfffc,0x4e75};
     volatile uint16_t *fast = (volatile uint16_t*)0x200000;
     for (unsigned i=0;i<sizeof code/sizeof code[0];i++) fast[i]=code[i];
+    for (unsigned i=0;i<sizeof code/sizeof code[0];i++) if (fast[i]!=code[i]) return 0;
     unsigned best=65535;
     for (unsigned i=0;i<3;i++) {
         plat_wait_vbl();

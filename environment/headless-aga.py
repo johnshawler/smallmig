@@ -59,6 +59,7 @@ void main(void){arhw_test_main();}
  move.w #0x2700,%sr
  move.b #3,0xbfe201
  bclr #0,0xbfe001
+ move.b #0x20,0xe80048
  lea image(%pc),%a0
  lea 0x800,%a1
  move.l #{(len(data)+3)//4-1},%d0
@@ -87,6 +88,8 @@ image:
 
 
 def execute(out):
+    for old in out.glob('fs-uae-*.png'):
+        old.unlink()
     base=out/'fs-uae'
     config=out/'fixture.fs-uae'
     config.write_text(f'''[fs-uae]
