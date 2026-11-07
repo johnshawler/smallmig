@@ -77,6 +77,12 @@ leave:
     move.w 0x606,%d0
     and.w #0xfff,%d0
     move.w %d0,0x180(%a0)
+    cmp.w #5,%d0
+    blo frame
+    cmp.w #10,%d0
+    bhi frame
+    move.w #0x534d,0xd00000
+    move.w %d0,0xd00002
     bra frame
 '''
     asm = OUT/'boot.s'
@@ -126,7 +132,7 @@ uae_cpu_speed = real
 uae_cpu_cycle_exact = true
 uae_cpu_memory_cycle_exact = true
 uae_blitter_cycle_exact = true
-uae_lua = {lua}
+uae_log_illegal_mem = true
 base_dir = {base}
 log_flush = 1
 ''')
@@ -144,7 +150,7 @@ log_flush = 1
                     for p in base.rglob('*'):
                         if p.is_file() and p.name in ('fs-uae.log.txt', 'debug.uae'):
                             logs += p.read_text(errors='replace')
-                if re.search(r'SMALLMIG_NATIVE frames=([5-9]|10)\b', logs):
+                if '00d00000=0000534d' in logs and re.search(r'00d00002=0000000[5-9]\b', logs):
                     break
                 if proc.poll() is not None:
                     raise RuntimeError('FS-UAE exited before the native fixture ran')
@@ -158,7 +164,7 @@ log_flush = 1
                 except subprocess.TimeoutExpired:
                     os.killpg(proc.pid, signal.SIGKILL)
                     proc.wait()
-    return {'native_loop_frames': int(re.search(r'SMALLMIG_NATIVE frames=(\d+)', logs)[1]),
+    return {'native_loop_frames': int(re.search(r'00d00002=([0-9a-f]{8})', logs)[1], 16),
             'headless_backend': 'Xvfb / software Mesa', 'firmware': 'original test firmware generated here',
             'profile': 'PAL A1200 68EC020, 2 MiB Chip + 8 MiB Fast, JIT disabled',
             'test_firmware_sha256': hashlib.sha256(firmware.read_bytes()).hexdigest()}
