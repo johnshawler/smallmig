@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """One-command build: ELF for inspection, raw bootblock, checksummed ADF."""
-import os, pathlib, struct, subprocess, hashlib, json
+import os, pathlib, struct, subprocess, hashlib, json, shutil
 root = pathlib.Path(__file__).resolve().parent
 os.chdir(root)
 out = root / 'build'
@@ -8,7 +8,7 @@ out.mkdir(exist_ok=True)
 tools = root / '.tools/usr'
 env = dict(os.environ, LD_LIBRARY_PATH=str(tools / 'lib/x86_64-linux-gnu'))
 def run(name, *args):
-    result = subprocess.run([str(tools / ('bin/m68k-linux-gnu-' + name)), *args], env=env, capture_output=True)
+    result = subprocess.run([(shutil.which('m68k-elf-' + name) or str(tools / ('bin/m68k-linux-gnu-' + name))), *args], env=env, capture_output=True)
     if result.returncode:
         raise SystemExit(result.stderr.decode(errors='replace'))
     return result
@@ -34,3 +34,4 @@ adf = block + bytes(901120 - len(block))
 report = {'payload_bytes': len(raw), 'adf_bytes': len(adf), 'explicit_chip_allocation_bytes': 16384, 'explicit_fast_allocation_bytes': 0, 'adf_sha256': hashlib.sha256(adf).hexdigest(), 'boot_checksum': hex(check), 'runtime_minimum_measured': False}
 (out/'build-report.json').write_text(json.dumps(report, indent=2)+'\n')
 print(json.dumps(report, indent=2))
+

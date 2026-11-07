@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Launch FS-UAE; a private ROM path is required, never shipped."""
-import os, pathlib, subprocess, sys, time
+import os, pathlib, subprocess, sys, time, shutil
 root = pathlib.Path(__file__).resolve().parent
 os.chdir(root)
 build = root/'build'
@@ -28,10 +28,12 @@ window_height = 720
 video_sync = off
 '''
 (build/'harness.fs-uae').write_text(config)
-exe = root/'.tools/usr/bin/fs-uae'
+exe = pathlib.Path(shutil.which('fs-uae') or str(root/'.tools/usr/bin/fs-uae'))
 runtime = build/'runtime'
 runtime.mkdir(exist_ok=True, mode=0o700)
 env = dict(os.environ, FS_UAE_BASE_DIR=str(base), XDG_DATA_HOME=str(build/'xdg'), XDG_CACHE_HOME=str(build/'cache'), XDG_RUNTIME_DIR=str(runtime))
+if sys.platform == 'darwin':
+    os.execve(str(exe), [str(exe), str(build/'harness.fs-uae'), *sys.argv[1:]], env)
 env.setdefault('SDL_VIDEODRIVER', 'x11')
 env.setdefault('SDL_VIDEO_X11_XRANDR', '0')
 if env.get('DISPLAY'):
@@ -61,3 +63,4 @@ finally:
             proc.kill(); proc.wait()
     xserver.terminate()
     xserver.wait(timeout=5)
+

@@ -46,3 +46,10 @@ The public import receives Python syntax checks and local host-only fixture chec
 ## Licenses
 
 Existing file-specific licenses are preserved; no new blanket license is assigned to the whole repository. The original probes/adapters carry 0BSD notices. The pinned Falling source and external fixture are MIT-licensed, Copyright (c) 2018 tragicmuffin, with notices in `experiments/homebrew/LICENSE_FALLING_MIT` and its `references/falling/LICENSE`. They come from [xram64/falling-nes](https://github.com/xram64/falling-nes/tree/52dcb8a951200562e696dfc2aba5d4d14edd0078). No NES ROM, CHR binary or proprietary firmware is bundled. The optional homebrew tests require separately supplied local fixture files. Mesen's GPL-3.0 notice is retained; its executable is downloaded separately from its pinned official release. References with unclear redistribution rights are not bundled.
+
+
+## Little League Baseball batting prototype
+
+The new [Little League experiment](experiments/little-league/README.md) builds a native Amiga batting loop from a separately supplied USA cartridge. It captures the original batting view in Mesen and reconstructs its background and players from mapped CHR, nametables, palettes and OAM. Gameplay and Paula effects in this first slice are newly implemented. The original NES game engine, fielding and music have not been ported.
+
+The original smoke-demo build and launcher now also recognize installed macOS `m68k-elf-*` tools and FS-UAE. The new experiment additionally requires an m68k GCC cross compiler.
