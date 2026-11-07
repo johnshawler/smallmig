@@ -6,7 +6,11 @@
  * v = palette*4 + pattern -> colour register v (4, 8, 12 = backdrop); even bitplanes (BPL2,4,6,8) = playfield 2 = sprite value u -> register 16+u (u = 0 transparent).
  * Per region the Copper writes (in the horizontal blank before its first line, only what changed): bitplane pointers, BPL1MOD/BPL2MOD, BPLCON1 and the changed colour registers.
  *   background window: N = bytex*8 + fx; r = N & 15; r == 0: first word (N>>4)-1, scroll 0; else first word N>>4, scroll 16-r; pointer = row address + 2*word (the word before the window is hidden; N = 0 uses word 31, the guard bytes continue the window with words 0..), modulo = bitmap row stride - 34.  Playfield 2 (unscrolled): pointer = row - 2 (hidden pad word), modulo = 32 - 34.
- *   The window reads bytes 2*w0 .. 2*w0+33 of the row: with w0 up to 31 the row needs 32 guard bytes behind its 64 bytes (copy of bytes 0..31): stride >= 96. */
+ *   The 16-bit window needs 32 wrap bytes behind each 64-byte row (stride 96).
+ * AR2_FETCH32 selects FMODE 1, DDF 0x30..0xC0, ten longword fetches, four hidden
+ * sprite bytes and extended BPLCON1 delays. High delays require one earlier
+ * source group and the final fetch. Background rows then use stride 104 with
+ * 40 wrap bytes; the Copper modulos use the full 40-byte fetch length. */
 #include <stdint.h>
 #include "platform.h"
 #include "display_ar2.h"
@@ -156,6 +160,8 @@ int ar2_build(uint32_t *list, unsigned max, const ArFrame *f, const Ar2Mem *m)
             unsigned mask = 512/AR2_FETCH_PIXELS-1;
             if (rr == 0) { w0 = ((N >> AR2_FETCH_SHIFT) + mask) & mask; s = 0; } else { w0 = N >> AR2_FETCH_SHIFT; s = AR2_FETCH_PIXELS - rr; }
 #ifdef AR2_FETCH32
+            /* Extended delays wrap the serializer by another complete group.
+             * Fetch one group earlier; the extra tail fetch covers that delay. */
             if (s >= 16) w0 = (w0 + mask) & mask;
 #endif
             for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)BG(r->cfg, k, r->row0) + AR2_PAD_BYTES * w0; np[2 * k + 1] = (uint32_t)SP(k, y0) - AR2_PAD_BYTES; }

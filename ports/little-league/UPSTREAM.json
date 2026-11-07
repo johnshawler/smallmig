@@ -15,7 +15,12 @@
     "exact 8-bit PCM output lookup",
     "optional 030/040/060 cache startup",
     "dynamic Fast RAM allocation and checked ELF relocation",
-    "private native full-match RAM checkpoints and screenshot comparison tools"
+    "private native full-match RAM checkpoints and screenshot comparison tools",
+    "coalesced translated I/O superblocks and direct controller/MMC1 helpers",
+    "blank-scanline PPU advancement and cached sprite membership",
+    "optional 32-bit AGA DMA with extended scrolling and wrap guards",
+    "headless cloud Copper pixel checks and native Chip-bus measurement",
+    "independent native CPU full-match and PCM hash checker"
   ],
   "rom_included": false
 }

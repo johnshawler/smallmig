@@ -18,6 +18,12 @@ Click inside the game window if the controller does not respond. Choose Exhibiti
 
 Use AGA, a 68020/68030, 2 MiB Chip and at least 4 MiB Fast RAM. The generated NTSC profile uses FS-UAE fast CPU mode with JIT disabled. This is the real-time playtest configuration, not a claim of stock 14 MHz A1200 speed. Stock-speed hardware acceptance remains open; the earlier stock exact-audio measurement was about 34% speed. Physical-hardware performance has not been certified.
 
+`--wide-dma` builds a separate experimental `Little-League-Original-Exact-Wide.adf`
+using 32-bit AGA fetches. It passed the cloud pixel fixture, nine graphics coverage
+scripts and a 100,001-frame native state check. The synthetic Chip RAM write test
+was about 48% faster with wider fetches; full-game stock-speed acceptance is still
+open. The default build retains the existing renderer.
+
 `--standard pal` writes a PAL profile. `--stock-timing` selects a hardware-speed diagnostic profile. `--cue-audio` selects the older approximate sound path for diagnosis; exact original APU PCM is the default.
 
 Controls in the supplied profile:
@@ -39,6 +45,7 @@ Only the verified USA cartridge is accepted: SHA-256 `f33ee3c2cdf4cb23bb06057423
 ```sh
 python3 ports/little-league/check.py --rom /private/little-league.nes
 python3 ports/little-league/check.py --rom /private/little-league.nes --draw-every 4
+python3 ports/little-league/check.py --rom /private/little-league.nes --wide-dma
 python3 ports/little-league/check.py --rom /private/little-league.nes --mesen /Applications/Mesen.app/Contents/MacOS/Mesen
 ```
 

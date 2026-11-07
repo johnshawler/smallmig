@@ -30,10 +30,15 @@ def build(args):
     out = ROOT / 'build/little-league-original'
     out.mkdir(parents=True, exist_ok=True)
     disk = out / ('Little-League-Original-Cue.adf' if args.cue_audio else 'Little-League-Original-Exact.adf')
+    if args.wide_dma:
+        disk = disk.with_stem(disk.stem+'-Wide')
     env = os.environ.copy()
     env.update(PREFIX=prefix, BUILD='smallmig-cue' if args.cue_audio else 'smallmig-exact',
                EXTRA='' if args.cue_audio else '-DAUDIO_EXACT', FASTRAM='1', FAST_BASE='0x200000',
                ARENDER_HW='2', RELOCATE='1', CACHE030='0', CACHE040='0', CACHE060='0')
+    if args.wide_dma:
+        env['BUILD'] += '-wide'
+        env['EXTRA'] += ' -DAR2_FETCH32'
     # Debug flags from the caller must never silently turn a player disk into a scripted test.
     for key in ('TESTINPUT', 'SNAPSHOT', 'DISPLAY_TEST', 'AUDIO_TEST', 'ARHW_TEST', 'FBFLAG', 'STATECHECK'):
         env.pop(key, None)
@@ -49,6 +54,7 @@ def build(args):
               'video_standard': args.standard,
               'audio': 'approximate Paula cues' if args.cue_audio else 'original APU event PCM mixer',
               'gameplay': 'original cartridge program, statically translated with interpreter fallback',
+              'renderer': 'experimental 32-bit AGA DMA' if args.wide_dma else '16-bit AGA DMA',
               'acceptance': 'original-engine fidelity checks recorded; stock-speed hardware acceptance remains open'}
     (out/'build-report.json').write_text(json.dumps(report, indent=2)+'\n')
     if args.kickstart:
@@ -84,6 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('--rom', required=True)
     parser.add_argument('--kickstart', help='Also write a local FS-UAE player configuration')
     parser.add_argument('--cue-audio', action='store_true', help='Diagnostic faster approximate sound mode')
+    parser.add_argument('--wide-dma', action='store_true', help='Build the experimental 32-bit AGA DMA renderer')
     parser.add_argument('--two-player', action='store_true', help='Map player two to WASD, F and G in the FS-UAE profile')
     parser.add_argument('--stock-timing', action='store_true', help='Write a hardware-speed diagnostic profile instead of the fast CPU playtest profile')
     parser.add_argument('--standard', choices=('ntsc', 'pal'), default='ntsc', help='Video standard for the generated FS-UAE profile')
