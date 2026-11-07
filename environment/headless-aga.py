@@ -161,6 +161,8 @@ log_flush = 1
                             return int(values[-1],16)
                         report={'variant':out.name,'pictures':64,'renderer_eclock_ticks':(value(0x10)<<16)|value(0x12),
                                 'max_renderer_eclock_ticks':(value(0x14)<<16)|value(0x16),
+                                'percentile_eclock_ticks':{k:(value(0x30+4*i)<<16)|value(0x32+4*i)
+                                                          for i,k in enumerate(['p50','p95','p99'])},
                                 'planar_sprite_fnv32':(value(0x18)<<16)|value(0x1a),
                                 'cache':{k:(value(0x20+4*i)<<16)|value(0x22+4*i)
                                          for i,k in enumerate(['calls','hits','misses','oam_words'])},

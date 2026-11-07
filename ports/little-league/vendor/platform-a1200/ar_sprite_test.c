@@ -10,6 +10,22 @@ static uint8_t chr[8192];
 static int8_t wave[128] __attribute__((aligned(4),section(".chipbuf")));
 extern uint32_t ar_sprite_cache_stats[4];
 static uint32_t hash=2166136261u;
+typedef struct { uint32_t tick;uint16_t ec; } Stamp;
+static Stamp stamp(void){
+    Stamp s;
+    do{s.tick=plat_tick_count;s.ec=plat_eclock();}while(s.tick!=plat_tick_count);
+    return s;
+}
+static uint32_t elapsed(Stamp before){
+    Stamp after=stamp();
+    uint32_t fine=(uint16_t)(before.ec-after.ec);
+    uint32_t coarse=(after.tick-before.tick)*(uint32_t)plat_tick_base;
+    /* The source-clock phase uncertainty is < one 11804-cycle tick, well
+     * below half of the 65536-cycle fine counter period. Recover its wraps.
+     * This fixture's bounded operations are far below the 32-bit limit. */
+    if(coarse>fine+32768)fine+=((coarse-fine+32768)>>16)<<16;
+    return fine;
+}
 static void word(unsigned reg,uint16_t value){*(volatile uint16_t*)(0xd00000+reg)=value;}
 static void value(unsigned reg,uint32_t v){word(reg,v>>16);word(reg+2,v);}
 static void prepare(unsigned frame,ArRegion *r)
@@ -50,25 +66,26 @@ void ar_sprite_test_main(void)
     *(volatile uint16_t*)0xdff0a4=64;*(volatile uint16_t*)0xdff0a6=124;
     *(volatile uint16_t*)0xdff0a8=0;*(volatile uint16_t*)0xdff096=0x8201;
     for(unsigned i=0;i<4;i++)ar_sprite_cache_stats[i]=0;
-    uint32_t sum=0,maximum=0;
+    uint32_t sum=0,maximum=0,times[64];
     for(unsigned f=0;f<64;f++){
         plat_wait_vbl();prepare(f,&r);
-        uint32_t tick=plat_tick_count;uint16_t before=plat_eclock();
+        Stamp before=stamp();
         ar_begin_frame(&n);ar_log_region(&n,&r);ar_end_frame(&n,&ar_out);
         /* Expand before publication switches the target sprite-layer set.
          * Hashing is deliberately outside the renderer timing interval. */
-        uint32_t elapsed=(uint16_t)(before-plat_eclock());
-        if(plat_tick_count-tick>4){word(0x08,0xbad);for(;;){};}
+        uint32_t cost=elapsed(before);
         for(unsigned k=0;k<4;k++)for(unsigned y=0;y<240;y++)for(unsigned i=0;i<32;i++)
             hash=(hash^AR_SPR(k,y)[i])*16777619u;
-        before=plat_eclock();
+        before=stamp();
         while(!display_frame(0,0))plat_wait_vbl();
-        elapsed+=(uint16_t)(before-plat_eclock());
-        sum+=elapsed;if(elapsed>maximum)maximum=elapsed;
+        cost+=elapsed(before);
+        times[f]=cost;sum+=cost;if(cost>maximum)maximum=cost;
         if((f&15)==15)word(6,0x2000+f);
     }
     plat_wait_vbl();plat_wait_vbl();
     value(0x10,sum);value(0x14,maximum);value(0x18,hash);
+    for(unsigned i=1;i<64;i++){uint32_t v=times[i];unsigned j=i;while(j && times[j-1]>v){times[j]=times[j-1];j--;}times[j]=v;}
+    value(0x30,times[31]);value(0x34,times[60]);value(0x38,times[63]);
     for(unsigned i=0;i<4;i++)value(0x20+4*i,ar_sprite_cache_stats[i]);
     word(0,0x534d);word(2,5);
     for(;;)__asm__ volatile("stop #0x2000");
