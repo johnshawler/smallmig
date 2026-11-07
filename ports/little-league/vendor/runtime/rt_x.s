@@ -184,6 +184,7 @@ rt_wr_mmc1:
 	or.b d6,d7
 	move.b d7,nes+8
 	rts
+    .globl rt_wr_gen
 rt_wr_gen:
 	movem.l d0-d1/a0-a1,-(sp)
 	moveq #0,d0

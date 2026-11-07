@@ -43,6 +43,7 @@ TERM_JMP={'JMP','RTS','RTI','BRK'}
 IO_TERM_ADDR={0x2000,0x4014}      # stores that must end the superblock (they can change event times)
 COALESCE_IO=os.environ.get('XL_COALESCE_IO','1')!='0'
 DIRECT_IO=os.environ.get('XL_DIRECT_IO','1')!='0'
+DIRECT_FIXED_IO=os.environ.get('XL_DIRECT_FIXED_IO','0')=='1'
 
 def stable_io_store(a):
     # These stores cannot change the CPU event deadline or the PRG mapping.
@@ -270,6 +271,11 @@ class Gen:
         self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr '+target); return 'd6'
     def helper_wr(self,idx,addr=None):
         target='rt_wr_mmc1' if DIRECT_IO and addr is not None and addr>=0x8000 else 'rt_wr'
+        # Only absolute, proven fixed I/O operands bypass the RAM/mapper
+        # classifier. Keep the original address and exact generic I/O helper;
+        # indexed/indirect targets retain runtime classification and wrapping.
+        if DIRECT_FIXED_IO and addr is not None and 0x2000<=addr<0x8000:
+            target='rt_wr_gen'
         self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr '+target)
     def penalty_idx(self,reg,lo):
         if lo==0: return

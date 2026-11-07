@@ -2,7 +2,7 @@
    Mirrors the register conventions of translator/x65.py. */
 	.text
 	.globl xl_call, F_FFF0, rt_disp, rt_rd, rt_wr, rt_slow, rt_unk, rt_unk_ent
-	.globl rt_rd_joy0, rt_rd_joy1, rt_wr_mmc1
+    .globl rt_rd_joy0, rt_rd_joy1, rt_wr_mmc1, rt_wr_gen
 /* void xl_call(XCtx *c)  c layout: 0 nzc,1 vflag,2 misc,4 adj(w), 8 d0..d5 (6 longs: 8..31), 32 entry, 36 saved sp, 40 ram, 44 win, 48 tabwin, 52 tabfix, 56 nztab, 60 fixbase */
 xl_call:
 	move.l 4(sp),a0
@@ -56,6 +56,7 @@ rt_rd_joy1:
 	rts
 rt_wr:
 rt_wr_mmc1:
+rt_wr_gen:
 	movem.l d0-d1/a0-a1,-(sp)
 	moveq #0,d0
 	move.w d7,d0
