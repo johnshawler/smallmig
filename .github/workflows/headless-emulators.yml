@@ -29,3 +29,4 @@ jobs:
           test ! -f build/headless/mesen.log || tail -60 build/headless/mesen.log
           test ! -f build/headless/fs-uae-console.log || tail -60 build/headless/fs-uae-console.log
           test ! -f build/headless/result.json || cat build/headless/result.json
+          find build/headless/fs-uae -type f \( -name fs-uae.log.txt -o -name debug.uae \) -exec tail -100 {} \;

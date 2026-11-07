@@ -51,32 +51,55 @@ end,emu.eventType.endFrame)
 
 
 def amiga_fixture():
-    # Add a test-only memory mailbox to the original native Small Mig smoke demo.
-    source = (ROOT/'src/boot.s').read_text()
-    assert source.count('\nframe:\n') == 1
-    source = source.replace('\nframe:\n', '''
+    # Original test firmware executes directly on reset; no licensed ROM or OS
+    # bootstrap is needed merely to prove native 68020/chipset execution.
+    source = '''.text
+    .long 0x1ff000,0xf80008
+    move.w #0x2700,%sr
+    move.w #0x7fff,0xdff09a
+    move.w #0x7fff,0xdff096
+    move.b #3,0xbfe201
+    bclr #0,0xbfe001
     move.l #0x534d4947,0x600
     clr.l 0x604
+    lea 0xdff000,%a0
 frame:
+    move.l 4(%a0),%d0
+    and.l #0x1ff00,%d0
+    cmp.l #0x12c00,%d0
+    bne frame
+leave:
+    move.l 4(%a0),%d0
+    and.l #0x1ff00,%d0
+    cmp.l #0x12c00,%d0
+    beq leave
     addq.l #1,0x604
-''')
+    move.w 0x606,%d0
+    and.w #0xfff,%d0
+    move.w %d0,0x180(%a0)
+    bra frame
+'''
     asm = OUT/'boot.s'
     asm.write_text(source)
     subprocess.run(['m68k-linux-gnu-as', '-m68020', '--register-prefix-optional', '-o', str(OUT/'boot.o'), str(asm)], check=True)
-    subprocess.run(['m68k-linux-gnu-ld', '-Ttext=0', '-e', '_start', '--oformat=binary', '-o', str(OUT/'boot.raw'), str(OUT/'boot.o')], check=True)
+    subprocess.run(['m68k-linux-gnu-ld', '-Ttext=0xf80000', '--oformat=binary', '-o', str(OUT/'boot.raw'), str(OUT/'boot.o')], check=True)
     raw = (OUT/'boot.raw').read_bytes()
     assert 12 < len(raw) <= 1024
-    block = bytearray(raw.ljust(1024, b'\0'))
+    block = bytearray(raw.ljust(524288, b'\xff'))
+    struct.pack_into('>I', block, len(block)-24, 0)
     total = 0
     for (word,) in struct.iter_unpack('>I', block):
         total += word
         total = (total & 0xFFFFFFFF) + (total >> 32)
-    struct.pack_into('>I', block, 4, (~total) & 0xFFFFFFFF)
-    disk = OUT/'native-smoke.adf'
-    disk.write_bytes(block + bytes(901120-1024))
+    struct.pack_into('>I', block, len(block)-24, (~total) & 0xFFFFFFFF)
+    firmware = OUT/'original-test-firmware.rom'
+    firmware.write_bytes(block)
     lua = OUT/'fs-uae.lua'
     # UAE's Lua state has only its explicit API, so no os/io/string libraries needed.
-    lua.write_text('''function on_uae_vsync()
+    lua.write_text('''local vsync=0
+function on_uae_vsync()
+ vsync=vsync+1
+ if vsync%100==0 then uae_log('SMALLMIG_VSYNC '..vsync..'\\n') end
  if uae_read_u16(0x600)==0x534d and uae_read_u16(0x602)==0x4947 then
   local count=uae_read_u16(0x606)
   if count>=5 and count<=10 then uae_log('SMALLMIG_NATIVE frames='..count..'\\n') end
@@ -91,8 +114,7 @@ cpu = 68EC020
 chip_memory = 2048
 fast_memory = 8192
 slow_memory = 0
-kickstart_file = internal
-floppy_drive_0 = {disk}
+kickstart_file = {firmware}
 floppy_drive_speed = 0
 floppy_drive_volume = 0
 ntsc_mode = 0
@@ -114,7 +136,7 @@ log_flush = 1
     with logpath.open('wb') as log:
         proc = subprocess.Popen(['xvfb-run', '-a', '-s', '-screen 0 1024x768x24', 'fs-uae', str(cfg)],
                                 env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-        deadline = time.monotonic()+100
+        deadline = time.monotonic()+30
         try:
             while time.monotonic() < deadline:
                 logs = logpath.read_text(errors='replace')
@@ -128,7 +150,7 @@ log_flush = 1
                     raise RuntimeError('FS-UAE exited before the native fixture ran')
                 time.sleep(0.25)
             else:
-                raise RuntimeError('FS-UAE did not report native frame progress within 100 seconds')
+                raise RuntimeError('FS-UAE did not report native frame progress within 30 seconds')
         finally:
             if proc.poll() is None:
                 os.killpg(proc.pid, signal.SIGTERM)
@@ -137,9 +159,9 @@ log_flush = 1
                     os.killpg(proc.pid, signal.SIGKILL)
                     proc.wait()
     return {'native_loop_frames': int(re.search(r'SMALLMIG_NATIVE frames=(\d+)', logs)[1]),
-            'headless_backend': 'Xvfb / software Mesa', 'firmware': 'built-in AROS replacement',
+            'headless_backend': 'Xvfb / software Mesa', 'firmware': 'original test firmware generated here',
             'profile': 'PAL A1200 68EC020, 2 MiB Chip + 8 MiB Fast, JIT disabled',
-            'adf_sha256': hashlib.sha256(disk.read_bytes()).hexdigest()}
+            'test_firmware_sha256': hashlib.sha256(firmware.read_bytes()).hexdigest()}
 
 
 if __name__ == '__main__':
