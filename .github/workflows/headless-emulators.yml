@@ -1,0 +1,31 @@
+name: Headless emulators
+on:
+  push:
+    branches: [little-league-playable]
+    paths:
+      - '.github/workflows/headless-emulators.yml'
+      - 'environment/headless-*'
+      - 'tools/setup_mesen.py'
+      - 'src/boot.s'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  execute:
+    runs-on: ubuntu-24.04
+    container: debian:13-slim
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Mesen and FS-UAE
+        run: sh environment/headless-install.sh
+      - name: Execute both emulators headlessly
+        run: python3 environment/headless-smoke.py
+      - name: Show installation and execution evidence
+        if: always()
+        run: |
+          test ! -f build/headless/mesen.log || tail -60 build/headless/mesen.log
+          test ! -f build/headless/fs-uae-console.log || tail -60 build/headless/fs-uae-console.log
+          test ! -f build/headless/result.json || cat build/headless/result.json
