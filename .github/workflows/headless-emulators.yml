@@ -7,6 +7,8 @@ on:
       - 'environment/headless-*'
       - 'tools/setup_mesen.py'
       - 'src/boot.s'
+      - 'ports/little-league/vendor/platform-a1200/display_ar2.*'
+      - 'ports/little-league/vendor/platform-a1200/arhw_test.c'
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +16,7 @@ jobs:
   execute:
     runs-on: ubuntu-24.04
     container: debian:13-slim
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -23,6 +25,8 @@ jobs:
         run: sh environment/headless-install.sh
       - name: Execute both emulators headlessly
         run: python3 environment/headless-smoke.py
+      - name: Compare native AGA fetch modes pixel for pixel
+        run: python3 environment/headless-aga.py
       - name: Show installation and execution evidence
         if: always()
         run: |

@@ -127,8 +127,8 @@ static uint32_t *emit_tel(uint32_t *p, St *st, unsigned y0)
 {
     uint32_t np[8];
     MOVE(0x10C, 0x0011); /* telemetry always uses colour bank zero */
-    for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)(ar2_tel + (k * 240 + y0) * 32) - 2; np[2 * k + 1] = (uint32_t)zero_row; }
-    p = emit_geom(p, st, np, (uint16_t)(32 - 34), (uint16_t)-34, 0, 0);
+    for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)(ar2_tel + (k * 240 + y0) * 32) - AR2_PAD_BYTES; np[2 * k + 1] = (uint32_t)zero_row; }
+    p = emit_geom(p, st, np, (uint16_t)(32 - AR2_FETCH_BYTES), (uint16_t)-AR2_FETCH_BYTES, 0, 0);
     MOVE(0x180, 0x666); MOVE(0x19E, 0x000); MOVE(0x106, BPLCON3_BASE2 | BPLCON3_LOCT2); MOVE(0x180, 0x666); MOVE(0x19E, 0x000); MOVE(0x106, BPLCON3_BASE2);
     return p;
 }
@@ -152,16 +152,18 @@ int ar2_build(uint32_t *list, unsigned max, const ArFrame *f, const Ar2Mem *m)
         if (ar2_tel_mode == 1 && y0 >= 224) break;
 #endif
         if (r->kind == AR_BG) {
-            unsigned N = (unsigned)r->bytex * 8 + r->fx, rr = N & 15, w0, s;
-            if (rr == 0) { w0 = ((N >> 4) + 31) & 31; s = 0; } else { w0 = N >> 4; s = 16 - rr; }
-            for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)BG(r->cfg, k, r->row0) + 2 * w0; np[2 * k + 1] = (uint32_t)SP(k, y0) - 2; }
-            mod1 = (uint16_t)(m->brow - 34); mod2 = (uint16_t)(32 - 34); con1 = (uint16_t)s;
+            unsigned N = (unsigned)r->bytex * 8 + r->fx, rr = N & (AR2_FETCH_PIXELS-1), w0, s;
+            unsigned mask = 512/AR2_FETCH_PIXELS-1;
+            if (rr == 0) { w0 = ((N >> AR2_FETCH_SHIFT) + mask) & mask; s = 0; } else { w0 = N >> AR2_FETCH_SHIFT; s = AR2_FETCH_PIXELS - rr; }
+            for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)BG(r->cfg, k, r->row0) + AR2_PAD_BYTES * w0; np[2 * k + 1] = (uint32_t)SP(k, y0) - AR2_PAD_BYTES; }
+            mod1 = (uint16_t)(m->brow - AR2_FETCH_BYTES); mod2 = (uint16_t)(32 - AR2_FETCH_BYTES);
+            con1 = (uint16_t)((s&15)|((s&0x30)<<6));
         } else if (r->kind == AR_EXACT) {
-            for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)X1(k, y0) - 2; np[2 * k + 1] = (uint32_t)X2(k, y0) - 2; }
-            mod1 = mod2 = (uint16_t)(32 - 34);
+            for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)X1(k, y0) - AR2_PAD_BYTES; np[2 * k + 1] = (uint32_t)X2(k, y0) - AR2_PAD_BYTES; }
+            mod1 = mod2 = (uint16_t)(32 - AR2_FETCH_BYTES);
         } else {                                                           /* AR_BLANK: backdrop only: the same zero words on every line */
             for (unsigned k = 0; k < 8; k++) np[k] = (uint32_t)zero_row;
-            mod1 = mod2 = (uint16_t)(-34);
+            mod1 = mod2 = (uint16_t)(-AR2_FETCH_BYTES);
         }
         { uint8_t pv[32]; ar_hw_palette(r, pv); pal_words(pv, r->gray, r->emph, hi, lo); }
         unsigned h = (unsigned)(r->y1 - r->y0 + 1), adv1 = r->kind == AR_BG ? m->brow : r->kind == AR_EXACT ? 32 : 0, adv2 = r->kind == AR_BLANK ? 0 : 32;
@@ -221,7 +223,7 @@ static int build(unsigned b)
 {
     static uint32_t used[AR_MAX_REGIONS];
     uint32_t *p = cop[b];
-    *p++ = (0x1FCu << 16) | 0x0000; *p++ = (0x100u << 16) | 0x0611; *p++ = (0x104u << 16) | 0x0040; *p++ = (0x092u << 16) | 0x0040; *p++ = (0x094u << 16) | 0x00C0;
+    *p++ = (0x1FCu << 16) | AR2_FMODE; *p++ = (0x100u << 16) | 0x0611; *p++ = (0x104u << 16) | 0x0040; *p++ = (0x092u << 16) | AR2_DDF_START; *p++ = (0x094u << 16) | AR2_DDF_STOP;
     for (int i = 0; i < ar_out.nreg; i++) used[i] = ar_out.reg[i].used;
     Ar2Mem m = { ar_hw.bmp, ar_hw.spr, ar_hw.xpf1, ar_hw.xpf2, AR_BROW, used };
     return ar2_build(p, COPW - 5, &ar_out, &m);

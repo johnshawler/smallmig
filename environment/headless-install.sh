@@ -10,7 +10,7 @@ apt-get update
 apt-get install -y --no-install-recommends ca-certificates python3 \
     fs-uae xvfb xauth libgl1-mesa-dri libglx-mesa0 libsdl2-2.0-0 \
     libopenal1 libicu76 libatomic1 libstdc++6 libfontconfig1 \
-    binutils-m68k-linux-gnu gcc-m68k-linux-gnu
+    binutils-m68k-linux-gnu gcc-m68k-linux-gnu xdotool python3-numpy python3-pil
 python3 tools/setup_mesen.py
 mkdir -p build/headless
 dpkg-query -W > build/headless/installed-packages.txt

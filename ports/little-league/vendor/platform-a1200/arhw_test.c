@@ -57,13 +57,18 @@ void arhw_test_main(void)
     for (unsigned i = 0; i < 10; i++) used[i] = (T[i].cfg ? 0x000000EFu : 0x0000FFFFu) | 0x00FE0000u;   /* palette entries shown: cfg 1: 0,1,2,3,5,6,7 (4 = backdrop), cfg 0: 0..15; sprites 17..23 */
     Ar2Mem m = { bmp, spr, xp1, xp2, BROW, used };
     uint32_t *p = list;
-    *p++ = (0x1FCu << 16) | 0x0000;           /* FMODE 0: 16-bit fetch */
+    *p++ = (0x1FCu << 16) | AR2_FMODE;
     *p++ = (0x100u << 16) | 0x0611;           /* 8 planes, dual playfield, colour */
     *p++ = (0x104u << 16) | 0x0040;           /* playfield 2 in front */
-    *p++ = (0x092u << 16) | 0x0040;           /* DDFSTRT / DDFSTOP: 17 words per line */
-    *p++ = (0x094u << 16) | 0x00C0;
+    *p++ = (0x092u << 16) | AR2_DDF_START;
+    *p++ = (0x094u << 16) | AR2_DDF_STOP;
     ar2_build(p, 2048 - 5, &frame, &m);
     plat_cop_ptr[0] = (uint32_t)list; plat_cop_ptr[1] = (uint32_t)list;
     plat_show(0);
+#ifdef ARHW_STANDALONE
+    plat_wait_vbl(); plat_wait_vbl();
+    *(volatile uint16_t*)0xd00000=0x534d;
+    *(volatile uint16_t*)0xd00002=5;
+#endif
     for (;;) __asm__ volatile("stop #0x2000");
 }
