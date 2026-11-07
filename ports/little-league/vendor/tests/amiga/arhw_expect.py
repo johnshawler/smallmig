@@ -14,7 +14,8 @@ spv = lambda y, x: ((x * 3 + y) & 7) if (x + y) % 5 < 2 else 0
 x1v = lambda y, x: (x * 5 + y * 3) & 15
 x2v = lambda y, x: ((x + 2 * y) & 15) if x % 3 else 0
 BG, EX, BL = 0, 1, 2
-T = [(4*i, 4*i+3, BG, int(i>=16), i*13, (i*17%512)//8, i*17%8, 0) for i in range(32)] + [
+T = [(3*i, 3*i+2, BG, int(i>=16), i*13, (i*17%512)//8, i*17%8, 0) for i in range(32)] + [
+     (96, 107, BG, 0, 500, 16, 0, 2), (108, 127, BG, 0, 0, 16, 0, 3),
      (128, 143, EX, 0, 0, 0, 0, 3), (144, 159, BL, 0, 0, 0, 0, 4), (160, 191, BG, 1, 0, 31, 5, 4), (192, 215, BG, 0, 200, 8, 0, 5), (216, 239, BG, 0, 224, 8, 0, 6)]
 exp = np.zeros((240, 256), dtype=np.uint32)
 for i, (y0, y1, kind, cfg, row0, bytex, fx, pv) in enumerate(T):
