@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Pixel-check the real Copper renderer under headless FS-UAE, without game assets."""
 import os
+import json
 from pathlib import Path
 import re
 import signal
@@ -137,6 +138,13 @@ log_flush = 1
                 files=list(out.glob('fs-uae-full-*.png'))
                 if files:
                     run([sys.executable,SRC/'tests/amiga/arhw_expect.py',files[-1],'pal'])
+                    ticks=re.findall(r'00d00004=([0-9a-fA-F]{8})',text)
+                    if not ticks:
+                        raise RuntimeError('Missing native Chip-bus measurement')
+                    report={'fetch_bits':int(out.name),'chip_long_writes':4096,
+                            'eclock_ticks':int(ticks[-1],16),'full_game_speed_certified':False}
+                    (out/'result.json').write_text(json.dumps(report,indent=2)+'\n')
+                    print(json.dumps(report),flush=True)
                     return
                 time.sleep(.1)
             raise RuntimeError('FS-UAE did not save the native framebuffer')

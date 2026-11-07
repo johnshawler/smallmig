@@ -13,6 +13,7 @@ def main():
     p.add_argument('--rom', required=True)
     p.add_argument('--frames', type=int, default=6000)
     p.add_argument('--draw-every', type=int, default=1)
+    p.add_argument('--wide-dma', action='store_true', help='Check the 32-bit AGA renderer bitmap layout')
     p.add_argument('--mesen', help='Also compare game RAM with this installed Mesen executable')
     p.add_argument('--mesen-timeout', type=int, default=120)
     a = p.parse_args()
@@ -26,7 +27,7 @@ def main():
     if not cc:
         raise SystemExit('A host C compiler is required')
     runtime = ['rt_core', 'cpu6502', 'ppu_ref', 'arender', 'mapper_mmc1', 'apu']
-    subprocess.run([cc, '-O2', '-DPPU_FB5', '-DRT_AUDIO=1', '-Wno-unused', '-Wno-unknown-pragmas',
+    subprocess.run([cc, '-O2', '-DPPU_FB5', '-DRT_AUDIO=1', *(['-DAR2_FETCH32'] if a.wide_dma else []), '-Wno-unused', '-Wno-unknown-pragmas',
                     '-o', str(out/'rt-host'), 'tools/rt_host.c',
                     *['runtime/'+s+'.c' for s in runtime]], cwd=src, check=True)
     subprocess.run([cc, '-O2', '-o', str(out/'apu-test'), 'tests/apu_test.c', 'runtime/apu.c'], cwd=src, check=True)

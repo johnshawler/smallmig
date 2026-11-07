@@ -15,6 +15,28 @@ static uint8_t xp1[4 * 240 * 32 + 4] __attribute__((aligned(4), section(".chipbu
 static uint8_t xp2[4 * 240 * 32 + 4] __attribute__((aligned(4), section(".chipbuf")));
 static uint32_t list[2048] __attribute__((aligned(4), section(".chipbuf")));
 static ArFrame frame;
+#ifdef ARHW_STANDALONE
+static uint32_t bus_scratch[4096] __attribute__((aligned(4), section(".chipbuf")));
+/* Position-independent 68020 loop, copied to Fast RAM: 4096 Chip long writes.
+ * This measures display bus contention, not full-game speed. */
+static unsigned bus_ticks(void)
+{
+    static const uint16_t code[] = {0x206f,4,0x303c,4095,0x223c,0x55aa,0x33cc,
+                                    0x20c1,0x51c8,0xfffc,0x4e75};
+    volatile uint16_t *fast = (volatile uint16_t*)0x200000;
+    for (unsigned i=0;i<sizeof code/sizeof code[0];i++) fast[i]=code[i];
+    unsigned best=65535;
+    for (unsigned i=0;i<3;i++) {
+        plat_wait_vbl();
+        while (((*(volatile uint32_t*)0xdff004 >> 8)&511) != plat_vstart) {}
+        uint16_t before=plat_eclock();
+        ((void (*)(void*))0x200000)(bus_scratch);
+        unsigned elapsed=(uint16_t)(before-plat_eclock());
+        if (elapsed<best) best=elapsed;
+    }
+    return best;
+}
+#endif
 
 /* pixel formulas (mirrored in tests/amiga/arhw_expect.py) */
 static unsigned bgv(unsigned c, unsigned r, unsigned x) { return (x + 3 * r + 5 * c + ((x >> 4) ^ (r >> 1))) & (c ? 7 : 15); }   /* configuration 1 shows only values 0..7 */
@@ -96,6 +118,7 @@ void arhw_test_main(void)
     plat_show(0);
 #ifdef ARHW_STANDALONE
     plat_wait_vbl(); plat_wait_vbl();
+    *(volatile uint16_t*)0xd00004=(uint16_t)bus_ticks();
     *(volatile uint16_t*)0xd00000=0x534d;
     *(volatile uint16_t*)0xd00002=5;
 #endif
