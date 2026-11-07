@@ -11,6 +11,9 @@ static uint32_t meta[32];
 static int done;
 static unsigned frames,checked;
 static uint64_t core_cycles;
+static uint64_t *profile, profile_time;
+static unsigned profile_pc,profile_first,profile_last;
+static int profile_active;
 static FILE *states;
 static uint8_t record[4392];
 static int have_record;
@@ -31,6 +34,11 @@ static void next_record(void){
 }
 static uint64_t le64(const uint8_t*p){ uint64_t v=0;for(int i=7;i>=0;i--)v=(v<<8)|p[i];return v; }
 static void hook(unsigned int pc){
+    if(profile){
+        uint64_t now=core_cycles+(unsigned)m68k_cycles_run();
+        if(profile_active) profile[(profile_pc&0xffffff)>>1]+=now-profile_time;
+        profile_time=now;profile_pc=pc;
+    }
     if(pc==0x1fe000){ done=1;m68k_end_timeslice();return; }
     if(pc==meta[HOOK_FRAME]){
         uint32_t sp=m68k_get_reg(NULL,M68K_REG_SP),f=m68k_read_memory_32(sp+4);
@@ -49,6 +57,7 @@ static void hook(unsigned int pc){
         if(frames%1000==0){ printf("native frames %u\n",frames);fflush(stdout); }
     }
     if(pc==meta[FATAL] || pc<0x1000){ fprintf(stderr,"Native exception PC=%08x\n",pc);exit(3); }
+    profile_active=profile && frames>=profile_first && frames<profile_last;
 }
 static void call(uint32_t fn,uint32_t a,uint32_t b){
     uint32_t sp=0x9ff000;
@@ -68,6 +77,14 @@ int main(int argc,char**argv){
     FILE*f=fopen(argv[3],"rb");if(!f){perror(argv[3]);return 2;}
     for(int i=0;i<=PCM_HASH;i++){uint8_t b[4];if(fread(b,1,4,f)!=4)return 2;meta[i]=(uint32_t)b[0]<<24|(uint32_t)b[1]<<16|(uint32_t)b[2]<<8|b[3];}fclose(f);
     states=fopen(argv[4],"rb");if(!states){perror(argv[4]);return 2;}next_record();
+    const char *profile_path=getenv("NATIVE_PROFILE");
+    if(profile_path){
+        profile=calloc(0x800000,sizeof *profile);
+        if(!profile){perror("profile allocation");return 2;}
+        profile_first=getenv("NATIVE_PROFILE_FIRST")?(unsigned)atoi(getenv("NATIVE_PROFILE_FIRST")):1600;
+        profile_last=getenv("NATIVE_PROFILE_LAST")?(unsigned)atoi(getenv("NATIVE_PROFILE_LAST")):2200;
+        if(profile_first>=profile_last || profile_last>(unsigned)strtoul(argv[5],0,10)) return 2;
+    }
     m68k_init();m68k_set_cpu_type(M68K_CPU_TYPE_68020);m68k_set_instr_hook_callback(hook);
     m68k_write_memory_32(0,0x9ff000);m68k_write_memory_32(4,0x200000);m68k_pulse_reset();
     call(meta[TABS],0,0);
@@ -78,6 +95,12 @@ int main(int argc,char**argv){
     m68k_write_memory_32(meta[RT]+m68k_read_memory_32(layout+4),meta[HOOK_INPUT]);
     call(meta[RUN],(uint32_t)strtoul(argv[5],0,10),0);
     if(have_record){fprintf(stderr,"Not all expected checkpoints executed\n");return 5;}
+    if(profile){
+        FILE *pf=fopen(profile_path,"w");if(!pf){perror(profile_path);return 2;}
+        fprintf(pf,"pc,core_cycles\n");
+        for(unsigned i=0;i<0x800000;i++) if(profile[i]) fprintf(pf,"%x,%llu\n",i*2,(unsigned long long)profile[i]);
+        fclose(pf);free(profile);
+    }
     printf("{\"native_frames\":%u,\"checkpoints\":%u,\"pcm_fnv32\":%u,\"core_cycles\":%llu,\"amiga_speed_certified\":false}\n",frames,checked,m68k_read_memory_32(meta[PCM_HASH]),(unsigned long long)core_cycles);
     return 0;
 }

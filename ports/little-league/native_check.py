@@ -7,6 +7,9 @@ Private inputs and generated binaries remain below ignored build directories.
 """
 import argparse
 import json
+import os
+import bisect
+import csv
 from pathlib import Path
 import shutil
 import struct
@@ -32,15 +35,22 @@ def main():
     p.add_argument('--states', required=True, type=Path, help='Host STATEOUT checkpoints for the same input script')
     p.add_argument('--musashi', required=True, type=Path, help='Musashi C source directory')
     p.add_argument('--frames', type=int, default=6000)
+    p.add_argument('--profile', action='store_true', help='Attribute independent-core cycles to native functions')
+    p.add_argument('--first', type=int, default=1600)
+    p.add_argument('--last', type=int, default=2200)
     p.add_argument('--pcm', type=Path, help='Compare the complete native PAL PCM stream hash against this host PCMOUT file')
     p.add_argument('--script', type=Path, default=SRC/'tools/discovery/inputs/play_watchgame.txt')
     a = p.parse_args()
     if a.frames < 2:
         p.error('frames must be at least two')
+    if a.profile and not 1<=a.first<a.last<=a.frames:
+        p.error('Require 1 <= first < last <= frames for profiling')
     prefix = next((x for x in ['m68k-elf-', 'm68k-linux-gnu-'] if shutil.which(x+'gcc')), None)
     if not prefix:
         p.error('m68k GCC and binutils are required')
     out = ROOT/'build/little-league-original/native-check'/(a.payload.parent.name+'-'+str(a.frames))
+    if a.profile:
+        out = out.with_name(out.name+f'-profile-{a.first}-{a.last}')
     out.mkdir(parents=True, exist_ok=True)
     game = symbols(a.payload, prefix)
     if game['_payload_base'] != 0x200000:
@@ -85,10 +95,15 @@ def main():
                     str(musashi/'m68kcpu.c'), str(out/'m68kops.c'), str(musashi/'softfloat/softfloat.c'),
                     '-lm', '-o', str(out/'native-cpu')], check=True)
     log = out/'result.log'
+    env=os.environ.copy()
+    for key in ('NATIVE_PROFILE','NATIVE_PROFILE_FIRST','NATIVE_PROFILE_LAST'):
+        env.pop(key,None)
+    if a.profile:
+        env.update(NATIVE_PROFILE=str(out/'profile.csv'),NATIVE_PROFILE_FIRST=str(a.first),NATIVE_PROFILE_LAST=str(a.last))
     with log.open('w') as stream:
         result = subprocess.run([str(out/'native-cpu'), str(a.payload.with_suffix('.bin').resolve()),
                                  str(out/'hooks.bin'), str(out/'metadata.bin'), str(out/'states.bin'), str(a.frames)],
-                                stdout=stream, stderr=subprocess.STDOUT, timeout=1800)
+                                stdout=stream, stderr=subprocess.STDOUT, timeout=1800,env=env)
     print(log.read_text(), end='')
     if result.returncode:
         raise SystemExit(result.returncode)
@@ -112,6 +127,36 @@ def main():
             raise SystemExit(f'Native PCM mismatch: expected {h:08x}, got {report["pcm_fnv32"]:08x}')
         report['pcm_reference_hash_matched']=True
     (out/'result.json').write_text(json.dumps(report, indent=2)+'\n')
+    if a.profile:
+        # The core has no Amiga memory contention. Retain cycles rather than
+        # presenting these as stock A1200 milliseconds or game-speed percentages.
+        functions={}
+        for line in subprocess.check_output([prefix+'nm','-n',str(a.payload)],text=True).splitlines():
+            fields=line.split()
+            if len(fields)==3 and fields[1] in ('t','T') and not fields[2].startswith('_pr'):
+                functions[int(fields[0],16)]=fields[2]
+        starts=sorted(functions)
+        grouped={}; categories={}; total=0
+        edges=[game['_pr'+str(i)] for i in range(11)]
+        labels=['translated','dispatch','helpers','time_model','PPU','interpreter_mapper','APU','renderer','platform_display','other']
+        with (out/'profile.csv').open() as stream:
+            for row in csv.DictReader(stream):
+                pc=int(row['pc'],16); cycles=int(row['core_cycles']); total+=cycles
+                i=bisect.bisect_right(starts,pc)-1
+                name=functions[starts[i]] if i>=0 and pc<edges[-1] else 'test_hook'
+                grouped[name]=grouped.get(name,0)+cycles
+                i=bisect.bisect_right(edges,pc)-1
+                category=labels[i] if 0<=i<len(labels) and pc<edges[-1] else 'test_hook'
+                categories[category]=categories.get(category,0)+cycles
+        result=dict(frame_window=[a.first,a.last],core_cycles=total,
+                    core_cycles_per_frame=total/(a.last-a.first),
+                    categories={k:dict(core_cycles=v,percent=100*v/total) for k,v in sorted(categories.items(),key=lambda x:-x[1])},
+                    top_functions=[dict(name=k,core_cycles=v,percent=100*v/total) for k,v in sorted(grouped.items(),key=lambda x:-x[1])[:40]],
+                    scope='CPU-only Musashi attribution, no Amiga bus contention or display DMA; test_hook includes PCM hashing absent from player')
+        if not 0<total<=report['core_cycles']:
+            raise SystemExit('Invalid native profile cycle accounting')
+        (out/'profile.json').write_text(json.dumps(result,indent=2)+'\n')
+        print(json.dumps(result,indent=2))
 
 
 if __name__ == '__main__':

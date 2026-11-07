@@ -4,6 +4,11 @@ This path runs the original cartridge program through the 6502-to-68020 translat
 
 The native translated game has completed the reference full match and passed all 11 RAM checkpoints through 100,000 frames. Fresh native menu, batting and field screenshots match the reference pixels. See `VALIDATION.md` for exact results and their scope.
 
+The requested gameplay target is now **50 Hz on PAL Amiga**, with a 20 ms update
+budget. The existing ADF still uses the original NES-rate CIA game clock; movement,
+timers and sound need timing conversion to preserve their pace at 50 Hz.
+Fresh Mesen measurements and optimization priorities are recorded in `SPEED.md`.
+
 ## Build and play
 
 With Python 3 and m68k GCC/binutils installed, run from the Small Mig root:

@@ -2,6 +2,11 @@
 
 Date: 2026-11-07. This is a development checkpoint, not 1:1 release acceptance.
 
+The user subsequently specified 50 Hz PAL gameplay (20 ms per update). The
+existing ADF's source-rate CIA clock has not yet been converted. `SPEED.md` records
+fresh source-speed measurements, native cost attribution and the required timing
+conversion; historical percentages below retain their original NES-rate baseline.
+
 ## Fresh results
 
 - Original Small Mig demo built and booted before port development.
