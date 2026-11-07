@@ -158,7 +158,9 @@ log_flush = 1
                         def value(reg):
                             values=re.findall(r'00d0%04x=([0-9a-fA-F]{8})'%reg,text)
                             if not values:raise RuntimeError('Missing renderer diagnostic '+hex(reg))
-                            return int(values[-1],16)
+                            # UAE may log the handler's sign-extended argument
+                            # for a word store; only its low 16 bits were written.
+                            return int(values[-1],16)&0xffff
                         report={'variant':out.name,'pictures':64,'renderer_eclock_ticks':(value(0x10)<<16)|value(0x12),
                                 'max_renderer_eclock_ticks':(value(0x14)<<16)|value(0x16),
                                 'percentile_eclock_ticks':{k:(value(0x30+4*i)<<16)|value(0x32+4*i)
