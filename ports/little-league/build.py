@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -39,6 +40,10 @@ def build(args):
     if args.wide_dma:
         env['BUILD'] += '-wide'
         env['EXTRA'] += ' -DAR2_FETCH32'
+    if args.compact_rowkey:
+        env['BUILD'] += '-rowkey'
+        env['EXTRA'] += ' -DAR_COMPACT_ROWKEY'
+        disk=disk.with_stem(disk.stem+'-Rowkey')
     # Debug flags from the caller must never silently turn a player disk into a scripted test.
     for key in ('TESTINPUT', 'SNAPSHOT', 'DISPLAY_TEST', 'AUDIO_TEST', 'ARHW_TEST', 'FBFLAG', 'STATECHECK'):
         env.pop(key, None)
@@ -47,8 +52,13 @@ def build(args):
     if len(data) != 901120:
         raise SystemExit('Unexpected ADF size')
     relocation = json.loads((HERE/'vendor/build'/env['BUILD']/'reloc.json').read_text())
+    subprocess.run([sys.executable,str(HERE/'memory_map.py'),str(HERE/'vendor/build'/env['BUILD']/'llb.elf'),
+                    '--output',str(out/'memory-map.json')],check=True)
     report = {'adf': disk.name, 'adf_bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
-              'rom_sha256': ROM_SHA, 'target': 'A1200, 68020/68030, AGA, 2 MiB Chip + at least 4 MiB Fast',
+              'rom_sha256': ROM_SHA, 'target': 'PAL A1200, stock 68EC020, AGA, 2 MiB Chip + 8 MiB Fast',
+              'minimum_fast_capacity_mib':4,'memory_map':'memory-map.json',
+              'source_gameplay_hz':60.0988,'presentation':'PAL vblank' if args.standard=='pal' else 'NTSC vblank',
+              'sprite_row_identity':'experimental compact exact key' if args.compact_rowkey else 'legacy exact key',
               'runtime_fast_bytes': relocation['memory_bytes'], 'loader': 'allocates and relocates into available Fast RAM',
               'playtest_profile': 'stock CPU timing' if args.stock_timing else 'FS-UAE fast CPU, JIT disabled',
               'video_standard': args.standard,
@@ -62,7 +72,7 @@ def build(args):
         if not ks.is_file():
             raise SystemExit('Kickstart file not found')
         config = ('[fs-uae]\namiga_model = A1200\ncpu = 68EC020\nchip_memory = 2048\n'
-                  'fast_memory = 4096\nslow_memory = 0\nfloppy_drive_count = 1\n'
+                  'fast_memory = 8192\nslow_memory = 0\nfloppy_drive_count = 1\n'
                   'floppy_drive_speed = 0\nfloppy_drive_volume = 0\n'
                   'joystick_port_1 = keyboard\n'
                   f'joystick_port_0 = {"keyboard" if args.two_player else "none"}\n'
@@ -91,7 +101,11 @@ if __name__ == '__main__':
     parser.add_argument('--kickstart', help='Also write a local FS-UAE player configuration')
     parser.add_argument('--cue-audio', action='store_true', help='Diagnostic faster approximate sound mode')
     parser.add_argument('--wide-dma', action='store_true', help='Build the experimental 32-bit AGA DMA renderer')
+    parser.add_argument('--compact-rowkey', action='store_true', help='Build the candidate cheaper exact sprite-row identity')
     parser.add_argument('--two-player', action='store_true', help='Map player two to WASD, F and G in the FS-UAE profile')
-    parser.add_argument('--stock-timing', action='store_true', help='Write a hardware-speed diagnostic profile instead of the fast CPU playtest profile')
-    parser.add_argument('--standard', choices=('ntsc', 'pal'), default='ntsc', help='Video standard for the generated FS-UAE profile')
+    timing=parser.add_mutually_exclusive_group()
+    timing.add_argument('--stock-timing', dest='stock_timing',action='store_true',help='Use stock CPU timing (default)')
+    timing.add_argument('--fast-cpu', dest='stock_timing',action='store_false',help='Explicit accelerated emulator playtest; not hardware-speed evidence')
+    parser.set_defaults(stock_timing=True)
+    parser.add_argument('--standard', choices=('ntsc', 'pal'), default='pal', help='Display standard; source game clock remains unchanged')
     build(parser.parse_args())

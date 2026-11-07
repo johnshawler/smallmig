@@ -718,10 +718,12 @@
     "scope": "Synthetic active-display transfer, not full-game speed"
   },
   "requested_target": {
-    "gameplay_hz": 50,
-    "update_budget_ms": 20,
+    "source_gameplay_hz": 60.0988,
+    "source_update_budget_ms": 16.639267339780496,
+    "presentation_hz_nominal": 50,
+    "picture_budget_ms_nominal": 20,
     "video_standard": "PAL",
-    "source_pacing_reference_hz": 60.098819691922586,
-    "timing_conversion_required": true
+    "timing_conversion_required": false,
+    "contract": "latest optimization brief preserves original source timeline"
   }
 }

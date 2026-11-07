@@ -25,8 +25,9 @@ Comparing every pixel of consecutive Mesen output frames gave:
 | 2,000–2,200, active field sequence | 200 | 0 |
 
 The mixed interval has 277 repeated pictures, but the active field sequence
-changes every frame. The requested Amiga target is **50 Hz PAL gameplay**, with **20 ms per update**.
-This source sequence establishes the motion reference to convert to that target.
+changes every frame. The current contract is **60.0988 Hz source updates** with **PAL presentation
+near 50 Hz**. Source updates have a 16.6393 ms budget; 50 pictures/s corresponds
+to 20 ms per completed picture, not a slower game loop.
 Unchanged-picture reuse helps static scenes; it is not a solution for all gameplay.
 
 Mesen's ROM instruction histogram concentrates 44.79% of observed instructions
@@ -79,10 +80,8 @@ with every output pixel still matching. This is not a 48% whole-game speedup.
 The earlier complete stock PAL A1200 exact-audio profile took 1,778 game-clock
 ticks for 600 source frames, about 33.75% speed, approximately 20.3 source frames
 per second. That build needs nearly a threefold total speedup to reach the
-original NES clock, or about a 2.47-fold throughput improvement to execute 50
-unmodified source frames per second. The requested native 50 Hz gameplay target
-also requires converting movement and timers; this throughput ratio alone does
-not establish the final converted game's cost or original pacing. The latest wider renderer has no fresh complete stock-speed
+original NES clock. Reaching 50 source updates/s would still be below the
+required original timeline; it is not the acceptance target. The latest wider renderer has no fresh complete stock-speed
 measurement yet. Existing public cloud jobs use original fixtures; a full-game
 cloud profile requires the cartridge and firmware in a private runner.
 
@@ -118,22 +117,21 @@ cloud profile requires the cartridge and firmware in a private runner.
    game already runs through native translation. In the active CPU-only sample,
    even eliminating the translated/dispatch/helper buckets entirely would offer
    only about a 26% upper-bound speedup in that model; optimizing a subset offers
-   less. This alone cannot supply the approximately 2.47-fold throughput improvement required even to execute
-   50 unmodified source frames per second in the older whole-system measurement.
+   less. This alone cannot supply the nearly threefold improvement suggested by
+   the older whole-system measurement.
 
-The user has specified **50 Hz PAL gameplay**, not a 60.0988 Hz game loop.
-Budget input, native game logic and presentation for 20 ms per update. Use the
-Mesen clock as the reference for movement, animation and game-clock durations.
-Simply running one unchanged NES frame every 20 ms would take about 20.2% longer
-for the same scripted sequence: 60.0988/50 = 1.20198. Preserve original pacing by
-converting velocities, timer/countdown units and animation scheduling to 50 Hz.
-APU event timestamps and Paula sample scheduling must be converted together so
-pitch and rhythm do not change accidentally.
+The supplied optimization brief supersedes the intermediate proposal to convert
+logic to 50 Hz. Retain the original **60.0988 Hz source-clock accumulator** and
+sample input and synthesize sound for every source update. PAL presentation runs
+separately near 50 Hz. A 20 ms picture budget is not a 20 ms source-update budget.
+The existing CIA source clock already has the correct rate.
 
-The existing ADF still uses the source-rate CIA game clock. The measurements here
-do not implement or certify that 50 Hz timing conversion. The next performance
-acceptance is 50 completed PAL gameplay updates per second with correct input,
-motion, timers and sound, measured in the full Amiga system.
+The player previously advanced its clock origin when more than eight updates
+late. That hides accumulated debt. The continuation removes that adjustment and
+records current/full high-water logic debt. This reports a missed deadline
+honestly; it does not make an overloaded engine catch up or provide a fully
+incremental renderer. Picture age, frozen event-segment snapshots and bounded
+render jobs remain further work.
 
 ## Reproduction
 

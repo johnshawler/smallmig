@@ -14,6 +14,8 @@ def main():
     p.add_argument('--frames', type=int, default=6000)
     p.add_argument('--draw-every', type=int, default=1)
     p.add_argument('--wide-dma', action='store_true', help='Check the 32-bit AGA renderer bitmap layout')
+    p.add_argument('--compact-rowkey', action='store_true', help='Test the candidate exact sprite-row identity')
+    p.add_argument('--force-row-rebuild', action='store_true', help='Disable sprite-row cache hits for comparison')
     p.add_argument('--mesen', help='Also compare game RAM with this installed Mesen executable')
     p.add_argument('--mesen-timeout', type=int, default=120)
     a = p.parse_args()
@@ -21,13 +23,16 @@ def main():
     if a.frames < 2 or a.draw_every < 1:
         p.error('frames must be at least 2; draw-every must be positive')
     out = ROOT/'build/little-league-original/checks'
+    if a.compact_rowkey or a.force_row_rebuild:
+        out=out.with_name(out.name+('-compact' if a.compact_rowkey else '-legacy')+('-rebuild' if a.force_row_rebuild else ''))
     out.mkdir(parents=True, exist_ok=True)
     src = HERE/'vendor'
     cc = os.environ.get('CC') or shutil.which('clang') or shutil.which('cc')
     if not cc:
         raise SystemExit('A host C compiler is required')
     runtime = ['rt_core', 'cpu6502', 'ppu_ref', 'arender', 'mapper_mmc1', 'apu']
-    subprocess.run([cc, '-O2', '-DPPU_FB5', '-DRT_AUDIO=1', *(['-DAR2_FETCH32'] if a.wide_dma else []), '-Wno-unused', '-Wno-unknown-pragmas',
+    defines=(['-DAR2_FETCH32'] if a.wide_dma else [])+(['-DAR_COMPACT_ROWKEY'] if a.compact_rowkey else [])+(['-DAR_NOROWCACHE'] if a.force_row_rebuild else [])
+    subprocess.run([cc, '-O2', '-DPPU_FB5', '-DRT_AUDIO=1', *defines, '-Wno-unused', '-Wno-unknown-pragmas',
                     '-o', str(out/'rt-host'), 'tools/rt_host.c',
                     *['runtime/'+s+'.c' for s in runtime]], cwd=src, check=True)
     subprocess.run([cc, '-O2', '-o', str(out/'apu-test'), 'tests/apu_test.c', 'runtime/apu.c'], cwd=src, check=True)

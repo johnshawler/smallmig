@@ -2,10 +2,10 @@
 
 Date: 2026-11-07. This is a development checkpoint, not 1:1 release acceptance.
 
-The user subsequently specified 50 Hz PAL gameplay (20 ms per update). The
-existing ADF's source-rate CIA clock has not yet been converted. `SPEED.md` records
-fresh source-speed measurements, native cost attribution and the required timing
-conversion; historical percentages below retain their original NES-rate baseline.
+The latest optimization brief requires retaining the original source timeline.
+It supersedes the intermediate 50 Hz logic proposal: source updates remain
+60.0988 Hz and PAL presentation is measured separately. Historical speed figures
+below use their original source-rate baseline.
 
 ## Fresh results
 
@@ -67,3 +67,15 @@ Historical results in `vendor/docs/` belong to the pinned upstream project. They
 - The wider bitmap layout passed all nine 6,000-frame planar/per-dot coverage scripts and the 588-check APU suite. A fresh native wider payload completed 100,001 frames and matched RAM, OAM, palette and nametables at all 11 private checkpoints. A separate 6,000-frame native run matched the full PAL PCM stream hash (1246956292). These CPU-only runs do not check DMA playback or game pacing.
 - Native translator unit tests passed 1,131 programs over 36,192 executions with zero failures, including coalesced I/O and individual exact access-cycle comparisons. QEMU 10's `-one-insn-per-tb` avoids the older emulator's known condition-code/TB boundary issue.
 - The wrapper's experimental wide ADF built to 901,120 bytes, SHA-256 `197f8b86f20e3c1d4721e8522bd15dafe4876225828f5fe54fbcb99b10831f2b`, requesting 2,819,188 bytes of Fast RAM with 9,486 relocations. The default renderer is unchanged. A new full-game stock timing profile, broader native game screenshots, uninterrupted audio playback and human acceptance of this candidate remain open; near-100% speed is not claimed.
+
+## Compact row-key continuation
+
+- Opt-in compact exact sprite-row keys passed cached versus forced-rebuild graphics checks: nine 6,000-frame scripts per mode, each with 5,999 compared pictures. The APU suite passed all 588 checks.
+- Candidate native payload completed 100,001 source frames and all 11 RAM/OAM/palette/nametable checkpoints. The full native PCM hash matched the preceding payload's full-match hash; a separate 6,000-frame run matched the host PCM hash 1246956292.
+- Paired native active-field profiles reduced total modeled core work 3.36% and renderer work 8.03%. These are CPU-only cost-model results.
+- Cloud run https://github.com/johnshawler/smallmig/actions/runs/42409042176 passed actual stock-timed FS-UAE renderer tests with display and Paula DMA active. Legacy, compact and forced rebuild each matched all 64 native sprite-plane states against an independent oracle and every final screenshot pixel.
+- Inclusive renderer elapsed time in the original synthetic fixture averaged 85.26 ms with legacy keys versus 78.82 ms with compact keys (7.55% less). Maximum fell 113.76 to 107.32 ms. Forced rebuild averaged 83.69 ms but had lower median/tail times than compact caching. Full-game APU synthesis was not part of this fixture. This is not a 7.55% player speedup or full-speed acceptance.
+- Builds now export linked RAM maps and default to a stock PAL 68EC020 profile with 2 MiB Chip + 8 MiB Fast, JIT disabled. `--fast-cpu` is an explicit accelerated playtest option. Actual relocated addresses and OS/loader peak memory are separate from the linked map.
+- A 1,036,312-byte fallback Fast allocation is unused by the native player; it remains unchanged in this experiment.
+- The main loop retains source-clock debt rather than moving the clock origin after eight late updates; current debt is exposed in telemetry. Player interval timing also counts fine-timer wraps. These changes compile in the candidate player; end-to-end pacing/input/audio playback acceptance remains open.
+- See `EXPERIMENTS.md` and `measurements/2026-11-07-rowkey.json` for the bounded experiment and remaining DMA ownership/scheduler requirements. The last delivered ADF is unchanged.

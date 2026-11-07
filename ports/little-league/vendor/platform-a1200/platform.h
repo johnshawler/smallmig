@@ -2,7 +2,7 @@
  * platform.h - Little League Baseball, Amiga 1200 platform layer (A1200 / AGA / 68EC020 / 2 MB chip RAM, no OS after the bootblock).
  * Derived from the proven A1200 layer of the Zoo Keeper port (boot, AGA display set-up, CIA tick, keyboard, joysticks).
  *
- *   CPU      68020 supervisor mode, VBR = 0, instruction cache on, data cache off.  All RAM is chip RAM.
+ *   CPU      68020 supervisor mode, VBR = 0, instruction cache on, data cache off. The Fast-required player places CPU code/data in Fast; DMA buffers remain Chip.
  *   Display  256x240 lores, 8 interleaved bitplanes (256 colours), border blanked; two buffers, flipped by the vertical-blank interrupt.
  *            PAL : display lines 52..291 (240 lines, centred in the 256 line standard window)
  *            NTSC: display lines 21..260 (240 lines; 21 is the first line the beam can display on a 262 line frame)

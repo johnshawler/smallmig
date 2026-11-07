@@ -1,13 +1,7 @@
-/* Linker script, Little League Baseball for the A1200 (2 MB chip RAM, no OS after the bootblock).
- *
- * One flat image linked at PAYLOAD_BASE (0x800) and loaded there by the bootblock.  Stored on the disk: .text .rodata .data and the 256 KB .rom
- * (a zero-filled placeholder patched by tools/build_adf.sh with the PRG+CHR of the .nes file).  .bss, the stack and the display buffers are NOLOAD
- * (.bss is cleared by crt0).  Everything lives in chip RAM.
- *
- *   0x000000-0x0007FF  vectors (0-0xFF) + bootblock relocator (0x200)
- *   0x000800-          .text (translated code, runtime, platform) .rodata .data .rom
- *   (after)            .bss: dispatch tables 8 x 64 KB, PPU/NES state with the 60 KB framebuffer, APU, display shadows, profiler
- *                      .stack, .chipbuf (two 60 KB bitplane buffers)
+/* Fast-required A1200 layout. CPU code, ROM data, BSS and stack use Fast RAM;
+ * custom-chip output uses .chipbuf. The relocation loader requests MEMF_FAST
+ * and applies fixups at the actual allocation, so ORIGIN(fast) is a link base,
+ * not a promise that this address is available at runtime. See memory_map.py.
  */
 OUTPUT_FORMAT("elf32-m68k")
 OUTPUT_ARCH(m68k)

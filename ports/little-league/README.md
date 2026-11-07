@@ -4,10 +4,10 @@ This path runs the original cartridge program through the 6502-to-68020 translat
 
 The native translated game has completed the reference full match and passed all 11 RAM checkpoints through 100,000 frames. Fresh native menu, batting and field screenshots match the reference pixels. See `VALIDATION.md` for exact results and their scope.
 
-The requested gameplay target is now **50 Hz on PAL Amiga**, with a 20 ms update
-budget. The existing ADF still uses the original NES-rate CIA game clock; movement,
-timers and sound need timing conversion to preserve their pace at 50 Hz.
-Fresh Mesen measurements and optimization priorities are recorded in `SPEED.md`.
+The current timing contract preserves the USA cartridge's **60.0988 Hz source
+updates, input and sound**, with PAL presentation scheduled separately near
+50 Hz. The supplied optimization brief supersedes the earlier proposal to convert
+logic to 50 Hz. `SPEED.md` records the source measurements and cost attribution.
 
 ## Build and play
 
@@ -21,7 +21,7 @@ Open `build/little-league-original/Little-League.fs-uae` in FS-UAE. The player i
 
 Click inside the game window if the controller does not respond. Choose Exhibition, 1P and the two teams with Z. On the lineup screen, X leaves order editing; press Right until the bottom command says End, then Z to begin the inning.
 
-Use AGA, a 68020/68030, 2 MiB Chip and at least 4 MiB Fast RAM. The generated NTSC profile uses FS-UAE fast CPU mode with JIT disabled. This is the real-time playtest configuration, not a claim of stock 14 MHz A1200 speed. Stock-speed hardware acceptance remains open; the earlier stock exact-audio measurement was about 34% speed. Physical-hardware performance has not been certified.
+Use AGA, a 68020/68030, 2 MiB Chip and at least 4 MiB Fast RAM. The generated profile now defaults to stock PAL 68EC020 timing, 2 MiB Chip and 8 MiB Fast RAM, with JIT disabled. `--fast-cpu` explicitly selects an accelerated playtest. Full-speed stock-hardware acceptance remains open. Stock-speed hardware acceptance remains open; the earlier stock exact-audio measurement was about 34% speed. Physical-hardware performance has not been certified.
 
 `--wide-dma` builds a separate experimental `Little-League-Original-Exact-Wide.adf`
 using 32-bit AGA fetches. It passed the cloud pixel fixture, nine graphics coverage
@@ -29,7 +29,7 @@ scripts and a 100,001-frame native state check. The synthetic Chip RAM write tes
 was about 48% faster with wider fetches; full-game stock-speed acceptance is still
 open. The default build retains the existing renderer.
 
-`--standard pal` writes a PAL profile. `--stock-timing` selects a hardware-speed diagnostic profile. `--cue-audio` selects the older approximate sound path for diagnosis; exact original APU PCM is the default.
+`--standard ntsc` selects NTSC presentation without changing the source clock. `--stock-timing` explicitly selects the default hardware-speed profile. `--cue-audio` selects the older approximate sound path for diagnosis; exact original APU PCM is the default.
 
 Controls in the supplied profile:
 
@@ -51,9 +51,16 @@ Only the verified USA cartridge is accepted: SHA-256 `f33ee3c2cdf4cb23bb06057423
 python3 ports/little-league/check.py --rom /private/little-league.nes
 python3 ports/little-league/check.py --rom /private/little-league.nes --draw-every 4
 python3 ports/little-league/check.py --rom /private/little-league.nes --wide-dma
+python3 ports/little-league/check.py --rom /private/little-league.nes --wide-dma --compact-rowkey --force-row-rebuild
 python3 ports/little-league/check.py --rom /private/little-league.nes --mesen /Applications/Mesen.app/Contents/MacOS/Mesen
 ```
 
 The checks compare the fast PPU and planar output against the per-dot reference, run the existing APU tests, and optionally compare all 2,048 game RAM bytes with a fresh Mesen run. Native screenshot comparison and complete-match RAM checks are separate tests. The internal checks do not certify native speed.
 
 `vendor/` preserves the pinned existing full-engine source, with local build/runtime changes listed in `UPSTREAM.json`. Documentation under `vendor/docs/` contains historical upstream results; current evidence is recorded in `VALIDATION.md`. Imported patch whitespace and existing notices are preserved. No new blanket license is assigned.
+
+The candidate `--compact-rowkey` path compares exact meaningful sprite-row inputs
+without clearing or checking unused slots. It retains the original key path and
+supports forced rebuild checks. It remains opt-in pending complete player timing.
+Each build exports `memory-map.json` and `memory-map.md`; their addresses are
+linked addresses unless a running relocated base was supplied to `memory_map.py`.

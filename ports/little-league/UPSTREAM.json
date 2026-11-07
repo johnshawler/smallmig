@@ -20,7 +20,10 @@
     "blank-scanline PPU advancement and cached sprite membership",
     "optional 32-bit AGA DMA with extended scrolling and wrap guards",
     "headless cloud Copper pixel checks and native Chip-bus measurement",
-    "independent native CPU full-match and PCM hash checker"
+    "independent native CPU full-match and PCM hash checker",
+    "opt-in compact exact sprite-row keys with forced-rebuild oracle and target timing",
+    "checked linked RAM map and stock PAL/Fast RAM build profiles",
+    "source-clock debt retained and elapsed-counter wraps measured"
   ],
   "rom_included": false
 }

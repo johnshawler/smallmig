@@ -12,9 +12,6 @@
 extern const uint8_t rom_start[];             /* PRG 128 KB then CHR 128 KB (linker symbol: the .rom section, patched into the disk image) */
 extern void tabs_expand(void);
 
-#ifndef BACKLOG_MAX
-#define BACKLOG_MAX 8                  /* game clock ticks the game may be behind real time before the lag is dropped (catch-up burst limit) */
-#endif
 #ifndef DISPLAY_SKIP_MAX
 #define DISPLAY_SKIP_MAX 3             /* consecutive frames whose picture conversion is skipped while behind real time */
 #endif
@@ -58,7 +55,7 @@ static uint8_t input(int port, long frame)
 
 /* ------------------------------------------------------------------ statistics (read back through the telemetry page) */
 static uint32_t game_base;             /* game clock tick at which frame 0 is due */
-static uint32_t st_idle, st_audio, st_disp, st_late, st_dskip, st_dconv, st_maxlag;
+static uint32_t st_idle, st_audio, st_disp, st_late, st_dskip, st_dconv, st_maxlag, st_logic_debt;
 static uint8_t skip_run;
 #ifdef TELEM
 static uint32_t sticky;
@@ -86,23 +83,41 @@ static void state_check(long f){
 #error ACCEPT_FAST requires STATECHECK
 #endif
 
-static inline uint32_t e_since(uint16_t t0) { return (uint16_t)(t0 - plat_eclock()); }
+typedef struct { uint32_t tick; uint16_t fine; } ClockStamp;
+static ClockStamp e_stamp(void)
+{
+    ClockStamp s;
+    do { s.tick=plat_tick_count; s.fine=plat_eclock(); } while(s.tick!=plat_tick_count);
+    return s;
+}
+static uint32_t e_since(ClockStamp before)
+{
+    ClockStamp after=e_stamp();
+    uint32_t fine=(uint16_t)(before.fine-after.fine);
+    uint32_t coarse=(after.tick-before.tick)*(uint32_t)plat_tick_base;
+    /* Recover complete fine-counter wraps for bounded work/wait intervals.
+     * One source-tick phase is less than half a fine-counter period. */
+    if(coarse>fine+32768)fine+=((coarse-fine+32768)>>16)<<16;
+    return fine;
+}
 
 static long f0;                        /* frame index at start (non-zero when starting from a snapshot) */
 
 static void on_frame(long f)
 {
-    uint16_t t0;
+    ClockStamp t0;
 #ifdef STATECHECK
     state_check(f);
 #endif
     uint32_t deadline = game_base + (uint32_t)(f - f0) + 1;
     int32_t lag = (int32_t)(plat_tick_count - deadline);
 
-    /* 1. pace to the game clock; when late, run on (catch-up) up to BACKLOG_MAX ticks, then drop the lag */
+    /* 1. Keep the original source deadlines. When late, retain all logic debt;
+     * shifting game_base would silently slow the source timeline. Drawing may
+     * be skipped, but completed source updates and the clock stay distinct. */
 #ifndef ACCEPT_FAST
-    if (lag < 0) { t0 = plat_eclock(); plat_wait_ticks(deadline); st_idle += e_since(t0); lag = 0; }
-    else if (lag > BACKLOG_MAX) { game_base += (uint32_t)(lag - BACKLOG_MAX); lag = BACKLOG_MAX; }
+    if (lag < 0) { t0 = e_stamp(); plat_wait_ticks(deadline); st_idle += e_since(t0); lag = 0; }
+    st_logic_debt=(uint32_t)lag;
     if (lag > 0) st_late++;
     if ((uint32_t)lag > st_maxlag) st_maxlag = (uint32_t)lag;
 #endif
@@ -116,7 +131,7 @@ static void on_frame(long f)
 #endif
     if (!drawn || pv) { skip_run++; st_dskip++; }
     else {
-        skip_run = 0; t0 = plat_eclock();
+        skip_run = 0; t0 = e_stamp();
         if (display_frame(nes.ppu.fb, nes.ppu.rowdirty)) { st_dconv++; shown_now = 1; }
         st_disp += e_since(t0);
 #ifdef TELEM
@@ -131,7 +146,8 @@ static void on_frame(long f)
 #ifdef STATECHECK
             w[19]=state_hash; w[20]=state_passed;
 #endif
-            telem_draw(plat_buf[display_back() ^ 1], w, 21, 224);
+            w[21]=st_logic_debt; w[22]=deadline;
+            telem_draw(plat_buf[display_back() ^ 1], w, 23, 224);
         }
 #endif
     }
@@ -158,9 +174,9 @@ static void on_frame(long f)
         int8_t *buf=test_pcm;  /* functional test: render every sample, omit hardware playback/pacing */
 #else
         int8_t *buf = audio_alloc();
-        if (!buf) { t0 = plat_eclock(); do plat_wait_ticks(plat_tick_count + 1); while (!(buf = audio_alloc())); st_idle += e_since(t0); }
+        if (!buf) { t0 = e_stamp(); do plat_wait_ticks(plat_tick_count + 1); while (!(buf = audio_alloc())); st_idle += e_since(t0); }
 #endif
-        t0 = plat_eclock();
+        t0 = e_stamp();
         unsigned w = audio_words_next();
         uint64_t to = nes.ppu.dots / 3 - 2;
         apu_render8(&rt_apu, a_from, to, buf, 2 * w);
@@ -173,7 +189,7 @@ static void on_frame(long f)
 #else                     /* cue mode: the APU state at the end of the frame programs the four Paula channels (no PCM, no ring) */
     {
         ApuCue cue;
-        t0 = plat_eclock();
+        t0 = e_stamp();
         uint64_t to = nes.ppu.dots / 3 - 2;
         apu_cue_frame(&rt_apu, to, plat_is_pal, &cue);
         audio_cue_apply(&cue);
@@ -239,7 +255,7 @@ void main(void)
     uint32_t base = plat_tick_count + 30, conv = 0, skipped = 0, e_conv = 0, e_max = 0, pairs = 0;
     for (unsigned k = 0; k < 600; k++) {
         plat_wait_ticks(++base);
-        uint16_t t0 = plat_eclock();
+        ClockStamp t0 = e_stamp();
 #ifdef DISPLAY_TEST_FLIP     /* no conversion: only the buffer flip logic (which game frames can be shown on a 50 Hz display) */
         int r = 0; if (!plat_show_pending()) { plat_show(k & 1); r = 1; }
 #else
