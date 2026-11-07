@@ -17,7 +17,7 @@ static int profile_active;
 static FILE *states;
 static uint8_t record[4392];
 static int have_record;
-enum { TABS,INIT,ROM,RUN,RT,NES,AR_ENABLE,HW_ENABLE,FATAL,HOOK_INIT,HOOK_FRAME,HOOK_INPUT,LAYOUT,PCM_HASH };
+enum { TABS,INIT,ROM,RUN,RT,NES,AR_ENABLE,HW_ENABLE,FATAL,HOOK_INIT,HOOK_FRAME,HOOK_INPUT,LAYOUT,PCM_HASH,CACHE_STATS };
 unsigned int m68k_read_memory_8(unsigned int a){ return mem[a&0xffffff]; }
 unsigned int m68k_read_memory_16(unsigned int a){ return (m68k_read_memory_8(a)<<8)|m68k_read_memory_8(a+1); }
 unsigned int m68k_read_memory_32(unsigned int a){ return (m68k_read_memory_16(a)<<16)|m68k_read_memory_16(a+2); }
@@ -75,7 +75,7 @@ int main(int argc,char**argv){
     if(argc!=6){fprintf(stderr,"usage: native_cpu payload.bin hooks.bin metadata.bin states.bin frames\n");return 2;}
     load(argv[1],0x200000);load(argv[2],0xa00000);
     FILE*f=fopen(argv[3],"rb");if(!f){perror(argv[3]);return 2;}
-    for(int i=0;i<=PCM_HASH;i++){uint8_t b[4];if(fread(b,1,4,f)!=4)return 2;meta[i]=(uint32_t)b[0]<<24|(uint32_t)b[1]<<16|(uint32_t)b[2]<<8|b[3];}fclose(f);
+    for(int i=0;i<=CACHE_STATS;i++){uint8_t b[4];if(fread(b,1,4,f)!=4)return 2;meta[i]=(uint32_t)b[0]<<24|(uint32_t)b[1]<<16|(uint32_t)b[2]<<8|b[3];}fclose(f);
     states=fopen(argv[4],"rb");if(!states){perror(argv[4]);return 2;}next_record();
     const char *profile_path=getenv("NATIVE_PROFILE");
     if(profile_path){
@@ -101,6 +101,13 @@ int main(int argc,char**argv){
         for(unsigned i=0;i<0x800000;i++) if(profile[i]) fprintf(pf,"%x,%llu\n",i*2,(unsigned long long)profile[i]);
         fclose(pf);free(profile);
     }
-    printf("{\"native_frames\":%u,\"checkpoints\":%u,\"pcm_fnv32\":%u,\"core_cycles\":%llu,\"amiga_speed_certified\":false}\n",frames,checked,m68k_read_memory_32(meta[PCM_HASH]),(unsigned long long)core_cycles);
+    printf("{\"native_frames\":%u,\"checkpoints\":%u,\"pcm_fnv32\":%u,\"core_cycles\":%llu,\"amiga_speed_certified\":false",frames,checked,m68k_read_memory_32(meta[PCM_HASH]),(unsigned long long)core_cycles);
+    if(meta[CACHE_STATS]){
+        printf(",\"sprite_cache\":{");
+        const char *keys[4]={"calls","hits","misses","oam_words"};
+        for(int i=0;i<4;i++)printf("%s\"%s\":%u",i?",":"",keys[i],m68k_read_memory_32(meta[CACHE_STATS]+4*i));
+        printf("}");
+    }
+    printf("}\n");
     return 0;
 }

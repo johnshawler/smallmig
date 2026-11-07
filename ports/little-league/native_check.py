@@ -77,6 +77,7 @@ def main():
     hooks = symbols(out/'hooks.elf', prefix)
     names = ['tabs_expand','rt_init','rom_start','xrt_run','rt','nes','ppu_ar_enable','ar_hw_enable','rt_fatal']
     addresses = [game[n] for n in names] + [hooks[n] for n in ['native_init','native_frame','native_input','native_layout','native_pcm_hash']]
+    addresses.append(game.get('ar_sprite_cache_stats',0))
     (out/'metadata.bin').write_bytes(struct.pack('>'+str(len(addresses))+'I', *addresses))
     data = a.states.read_bytes()
     if len(data) % 4392:

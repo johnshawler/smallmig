@@ -9,6 +9,8 @@ on:
       - 'src/boot.s'
       - 'ports/little-league/vendor/platform-a1200/display_ar2.*'
       - 'ports/little-league/vendor/platform-a1200/arhw_test.c'
+      - 'ports/little-league/vendor/platform-a1200/ar_sprite_test.c'
+      - 'ports/little-league/vendor/runtime/arender.*'
       - 'ports/little-league/vendor/tests/**'
       - 'ports/little-league/vendor/translator/**'
   workflow_dispatch:

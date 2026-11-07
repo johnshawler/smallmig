@@ -300,6 +300,13 @@ static __attribute__((noinline)) void hw_build_lists(int h){
 }
 /* the sprite layer line y of the background region s (cover of the clipped background, then the sprites) */
 static uint32_t hw_used, tmpsg[12];
+/* Test-only counters: calls, hits, misses, OAM words inspected. */
+uint32_t ar_sprite_cache_stats[4];
+#ifdef AR_CACHE_STATS
+#define SPRSTAT(i,n) (ar_sprite_cache_stats[i]+=(n))
+#else
+#define SPRSTAT(i,n) ((void)0)
+#endif
 #if __BYTE_ORDER__==__ORDER_BIG_ENDIAN__
 #define LD16(p) (*(const uint16_t*)(p))
 #define ST16(p,v) (*(uint16_t*)(p)=(uint16_t)(v))
@@ -313,16 +320,49 @@ static __attribute__((noinline)) void hw_line(Nes*n,const ArRegion*s,int y){
     int cl=s->bg_en?(s->min_bg>256?256:s->min_bg):256, clb=cl>>3, lo=32, hi=-1;
     uint8_t*L0=(uint8_t*)tmpl[0],*L1=(uint8_t*)tmpl[1],*L2=(uint8_t*)tmpl[2],*L3=(uint8_t*)tmpl[3];
     uint32_t used0=hw_used; hw_used=0; int cacheable=1; uint32_t*sg=spr_sg[ar_hw.sel][y];
+    SPRSTAT(0,1);
+#ifdef AR_COMPACT_ROWKEY
+    /* Compare only meaningful words. The count is part of the identity, so
+     * stale unused sprite slots never need clearing or comparing. No hash. */
+    unsigned keywords=2;
+    {
+        unsigned cnt=0; int e=y-1,prio=0;
+        uint32_t head=0,banks=(uint32_t)clb<<16;
+        if(y>=1 && s->sp_en && s->min_sp<256){
+            int h=s->large?16:8; if(!sl_valid || sl_h!=h) hw_build_lists(h);
+            cnt=sl_cnt[e];
+            head=(uint32_t)cnt|((uint32_t)s->large<<4)|((uint32_t)s->sppat<<5)|((uint32_t)s->min_sp<<16);
+            banks|=(uint32_t)s->chr_lo|((uint32_t)s->chr_hi<<8);
+        }
+        int same=sg[0]==head && sg[1]==banks;
+        for(unsigned q=0;q<cnt;q++){
+            uint32_t w=LD32(&ar_scene.oam[sl_idx[e][q]*4]);
+            tmpsg[2+q]=w; same&=sg[2+q]==w; prio|=(w&0x2000)!=0;
+        }
+        SPRSTAT(3,cnt); keywords=cnt+2;
+        uint32_t bg=0,gen=0;
+        if(prio){ bg=(uint32_t)(s->row0+(y-s->y0))|((uint32_t)s->bytex<<10)|((uint32_t)s->fx<<17)|((uint32_t)s->cfg<<20); gen=cfgs[s->cfg].gen; }
+#ifndef AR_NOROWCACHE
+        if(same && sg[10]==bg && sg[11]==gen){ SPRSTAT(1,1); hw_used=used0|spr_su[ar_hw.sel][y]; return; }
+#endif
+        tmpsg[0]=head; tmpsg[1]=banks; tmpsg[10]=bg; tmpsg[11]=gen;
+    }
+#else
     {   /* the line is a function of the sprites in range, the pattern banks, the clip: the same inputs as when the line was drawn into this set -> nothing to do (not for sprites behind the background) */
         uint32_t k[12]; int cnt=0, e=y-1, prio=0; for(int i=0;i<12;i++) k[i]=0;
         if(y>=1 && s->sp_en && s->min_sp<256){ int h=s->large?16:8; if(!sl_valid || sl_h!=h) hw_build_lists(h); cnt=sl_cnt[e];
             k[0]=(uint32_t)cnt|((uint32_t)s->large<<4)|((uint32_t)s->sppat<<5)|((uint32_t)s->min_sp<<16); k[1]=(uint32_t)s->chr_lo|((uint32_t)s->chr_hi<<8);
             for(int q=0;q<cnt;q++){ uint32_t w=LD32(&ar_scene.oam[sl_idx[e][q]*4]); k[2+q]=w; if(w&0x2000) prio=1; } }
+        SPRSTAT(3,cnt);
         if(prio){ k[10]=(uint32_t)(s->row0+(y-s->y0))|((uint32_t)s->bytex<<10)|((uint32_t)s->fx<<17)|((uint32_t)s->cfg<<20); k[11]=cfgs[s->cfg].gen; }   /* behind the background: depends on the background window too */
         k[1]|=(uint32_t)clb<<16;
-        if(cacheable && sg[0]==k[0] && sg[1]==k[1] && !((sg[2]^k[2])|(sg[3]^k[3])|(sg[4]^k[4])|(sg[5]^k[5])|(sg[6]^k[6])|(sg[7]^k[7])|(sg[8]^k[8])|(sg[9]^k[9])|(sg[10]^k[10])|(sg[11]^k[11]))){ hw_used=used0|spr_su[ar_hw.sel][y]; return; }
+#ifndef AR_NOROWCACHE
+        if(cacheable && sg[0]==k[0] && sg[1]==k[1] && !((sg[2]^k[2])|(sg[3]^k[3])|(sg[4]^k[4])|(sg[5]^k[5])|(sg[6]^k[6])|(sg[7]^k[7])|(sg[8]^k[8])|(sg[9]^k[9])|(sg[10]^k[10])|(sg[11]^k[11]))){ SPRSTAT(1,1); hw_used=used0|spr_su[ar_hw.sel][y]; return; }
+#endif
         for(int i=0;i<12;i++) tmpsg[i]=k[i];
     }
+#endif
+    SPRSTAT(2,1);
     if(clb){ for(int i=0;i<clb;i++) L2[i]=0xFF; lo=0; hi=clb-1; hw_used|=1; }       /* value 4 = backdrop colour, covers the background pixels */
     if(y>=1 && s->sp_en && s->min_sp<256){
         int e=y-1, cnt=sl_cnt[e];
@@ -358,7 +398,12 @@ static __attribute__((noinline)) void hw_line(Nes*n,const ArRegion*s,int y){
     }
     {   /* write the changed long words of the line (union of the old and the new extent) to the layer in chip RAM */
         unsigned old=spr_ext[ar_hw.sel][y]; int olo=old&255, ohi=old>>8;
+#ifdef AR_COMPACT_ROWKEY
+        for(unsigned i=0;i<keywords;i++) sg[i]=tmpsg[i];
+        sg[10]=tmpsg[10]; sg[11]=tmpsg[11];
+#else
         for(int i=0;i<12;i++) sg[i]=tmpsg[i];
+#endif
         spr_su[ar_hw.sel][y]=hw_used; hw_used|=used0;
         if(hi<0 && ohi<olo) return;
         int a=lo<olo?lo:olo, b=hi>ohi?hi:ohi;

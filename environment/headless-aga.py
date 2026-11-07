@@ -20,8 +20,8 @@ def run(command, **kw):
     return subprocess.run([str(x) for x in command], check=True, **kw)
 
 
-def firmware(mode):
-    out = OUT/str(mode)
+def firmware(mode, sprite=None):
+    out = OUT/(str(mode) if sprite is None else 'sprite-'+sprite)
     out.mkdir(parents=True, exist_ok=True)
     (out/'driver.c').write_text('''#include "display_ar2.h"
 void display_init(void){}
@@ -33,15 +33,27 @@ void ar_hw_palette(const ArRegion*r,unsigned char*out){
 extern void arhw_test_main(void);
 void main(void){arhw_test_main();}
 ''')
+    if sprite is not None:
+        (out/'driver.c').write_text('void plat_isr_audio_c(void){*(volatile unsigned short*)0xdff09c=0x180;}\nextern void ar_sprite_test_main(void);\nvoid main(void){ar_sprite_test_main();}\n')
     flags = ['-m68020','-ffreestanding','-nostdlib','-fno-pic','-O2','-fno-tree-loop-distribute-patterns',
              '-DAMIGA','-DPPU_FB5','-DARHW_STANDALONE','-I'+str(SRC/'platform-a1200'),
              '-I'+str(SRC/'platform-a1200/freestanding')]
     if mode==32:
         flags.append('-DAR2_FETCH32')
+    if sprite is not None:
+        flags+=['-DARENDER_HW','-DARENDER_HW2','-DAR_NO_STATIC','-DAR_CACHE_STATS']
+        if sprite in ('compact','rebuild'):
+            flags.append('-DAR_COMPACT_ROWKEY')
+        if sprite=='rebuild':
+            flags.append('-DAR_NOROWCACHE')
     objects=[]
-    for name in ['platform','display_ar2','arhw_test','palette','libc']:
+    for name in ['platform','display_ar2','arhw_test' if sprite is None else 'ar_sprite_test','palette','libc']:
         obj=out/(name+'.o')
         run([PREFIX+'gcc',*flags,'-c',SRC/'platform-a1200'/(name+'.c'),'-o',obj])
+        objects.append(obj)
+    if sprite is not None:
+        obj=out/'arender.o'
+        run([PREFIX+'gcc',*flags,'-c',SRC/'runtime/arender.c','-o',obj])
         objects.append(obj)
     run([PREFIX+'gcc',*flags,'-c',out/'driver.c','-o',out/'driver.o'])
     objects.append(out/'driver.o')
@@ -50,10 +62,11 @@ void main(void){arhw_test_main();}
         run([PREFIX+'gcc','-m68020','-x','assembler','-c',SRC/'platform-a1200'/(name+'.s'),'-o',obj])
         objects.append(obj)
     libgcc=subprocess.check_output([PREFIX+'gcc','-m68020','-print-libgcc-file-name'],text=True).strip()
-    run([PREFIX+'ld','-z','noexecstack','--no-warn-rwx-segments','-T',SRC/'platform-a1200/link.ld',
+    run([PREFIX+'ld','-z','noexecstack','--no-warn-rwx-segments','-T',SRC/'platform-a1200'/('link.ld' if sprite is None else 'link_fast.ld'),
          '-o',out/'fixture.elf',*objects,libgcc])
     run([PREFIX+'objcopy','-O','binary',out/'fixture.elf',out/'fixture.bin'])
     data=(out/'fixture.bin').read_bytes()
+    base=0x800 if sprite is None else 0x200000
     (out/'reset.s').write_text(f'''.text
  .long 0x1ff000,0xf80008
  move.w #0x2700,%sr
@@ -61,13 +74,13 @@ void main(void){arhw_test_main();}
  bclr #0,0xbfe001
  move.b #0x20,0xe80048
  lea image(%pc),%a0
- lea 0x800,%a1
+ lea {base:#x},%a1
  move.l #{(len(data)+3)//4-1},%d0
 copy:
  move.l (%a0)+,(%a1)+
  subq.l #1,%d0
  bpl copy
- jmp 0x800
+ jmp {base:#x}
  .balign 4
 image:
  .incbin "{out/'fixture.bin'}"
@@ -140,6 +153,21 @@ log_flush = 1
             while time.monotonic()<deadline:
                 files=list(out.glob('fs-uae-full-*.png'))
                 if files:
+                    if out.name.startswith('sprite-'):
+                        def value(reg):
+                            values=re.findall(r'00d0%04x=([0-9a-fA-F]{8})'%reg,text)
+                            if not values:raise RuntimeError('Missing renderer diagnostic '+hex(reg))
+                            return int(values[-1],16)
+                        report={'variant':out.name,'pictures':64,'renderer_eclock_ticks':(value(0x10)<<16)|value(0x12),
+                                'max_renderer_eclock_ticks':(value(0x14)<<16)|value(0x16),
+                                'pixel_index_fnv32':(value(0x18)<<16)|value(0x1a),
+                                'cache':{k:(value(0x20+4*i)<<16)|value(0x22+4*i)
+                                         for i,k in enumerate(['calls','hits','misses','oam_words'])},
+                                'full_game_speed_certified':False}
+                        run([sys.executable,SRC/'tests/amiga/ar_sprite_expect.py',files[-1],str(report['pixel_index_fnv32'])])
+                        (out/'result.json').write_text(json.dumps(report,indent=2)+'\n')
+                        print(json.dumps(report),flush=True)
+                        return
                     run([sys.executable,SRC/'tests/amiga/arhw_expect.py',files[-1],'pal'])
                     ticks=re.findall(r'00d00004=([0-9a-fA-F]{8})',text)
                     if not ticks:
@@ -166,3 +194,10 @@ if __name__=='__main__':
         for mode in [16,32]:
             out=firmware(mode)
             run(['xvfb-run','-a','-s','-screen 0 1024x768x24',sys.executable,__file__,'--inside',out])
+        results=[]
+        for variant in ['legacy','compact','rebuild']:
+            out=firmware(32,variant)
+            run(['xvfb-run','-a','-s','-screen 0 1024x768x24',sys.executable,__file__,'--inside',out])
+            results.append(json.loads((out/'result.json').read_text()))
+        assert len({r['pixel_index_fnv32'] for r in results})==1
+        print('Sprite path comparison: '+json.dumps(results),flush=True)
