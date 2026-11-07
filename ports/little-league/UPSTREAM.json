@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/johnshawler/little-league-baseball-amiga",
+  "commit": "ab7efaf09e41838593e3c6a871e077678efcacba",
+  "tree": "8610f313eedbc980c7017abc5593ee3a220b83c8",
+  "contents": "Source files only; generated CPU vectors and cached Python bytecode omitted. Existing authorship and file-specific notices preserved.",
+  "local_changes": [
+    "macOS bare-metal toolchain support",
+    "bounded frame arithmetic",
+    "redundant nametable write suppression",
+    "OAM content reuse for sprite evaluation",
+    "fixed source-frame profiling and telemetry fixes",
+    "optional private game-state dumps for fresh Mesen comparison",
+    "cached exact PCM sample boundaries",
+    "selectable fast-memory link address"
+  ],
+  "rom_included": false
+}
