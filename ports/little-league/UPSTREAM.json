@@ -11,7 +11,11 @@
     "fixed source-frame profiling and telemetry fixes",
     "optional private game-state dumps for fresh Mesen comparison",
     "cached exact PCM sample boundaries",
-    "selectable fast-memory link address"
+    "selectable fast-memory link address",
+    "exact 8-bit PCM output lookup",
+    "optional 030/040/060 cache startup",
+    "dynamic Fast RAM allocation and checked ELF relocation",
+    "private native full-match RAM checkpoints and screenshot comparison tools"
   ],
   "rom_included": false
 }

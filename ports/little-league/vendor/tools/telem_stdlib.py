@@ -1,7 +1,7 @@
 """Decode native FS-UAE telemetry captures without Pillow."""
 import json,sys
 from png_simple import read_png
-FIELDS=['magic','tick','frames','vbl','underruns','chunks_played','disp_conv','disp_skip','idle_e','audio_e','disp_e','late','maxlag','pairs','pal','apu_dropped','input','sticky_input']
+FIELDS=['magic','tick','frames','vbl','underruns','chunks_played','disp_conv','disp_skip','idle_e','audio_e','disp_e','late','maxlag','pairs','pal','apu_dropped','input','sticky_input','load_base','ram_hash','state_checks']
 def decode(path,profile=False):
  w,h,rgb=read_png(path)
  def pixel(x,y):return rgb[(y*w+x)*3:(y*w+x)*3+3]
@@ -17,7 +17,7 @@ def decode(path,profile=False):
      return v
     magic=word(x,y)
     if magic!=(0x4c4c4230 if profile else 0x4c4c4231):continue
-    vals=[word(x+(i%8)*32*scale,y+(i//8)*2*scale) for i in range(104 if profile else 18)]
+    vals=[word(x+(i%8)*32*scale,y+(i//8)*2*scale) for i in range(104 if profile else len(FIELDS))]
     return ({'words':vals} if profile else dict(zip(FIELDS,vals)))|{'origin':[x,y],'scale':scale}
  raise ValueError('Telemetry magic not found')
 if __name__=='__main__':

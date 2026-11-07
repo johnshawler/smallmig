@@ -50,9 +50,7 @@ Existing file-specific licenses are preserved; no new blanket license is assigne
 
 ## Little League Baseball batting prototype
 
-The new [Little League experiment](experiments/little-league/README.md) builds a native Amiga batting loop from a separately supplied USA cartridge. It captures the original batting view in Mesen and reconstructs its background and players from mapped CHR, nametables, palettes and OAM. Gameplay and Paula effects in this first slice are newly implemented. The original NES game engine, fielding and music have not been ported.
-
-The original smoke-demo build and launcher now also recognize installed macOS `m68k-elf-*` tools and FS-UAE. The new experiment additionally requires an m68k GCC cross compiler.
+The earlier [batting experiment](experiments/little-league/README.md) is retained as a standalone native prototype. The full cartridge-engine port below is now the main development path.
 
 ## Little League Baseball original engine
 

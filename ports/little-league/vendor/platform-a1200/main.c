@@ -64,6 +64,27 @@ static uint8_t skip_run;
 static uint32_t sticky;
 #endif
 static uint64_t a_from;
+#ifdef STATECHECK
+static const struct { uint32_t frame, hash; } state_targets[] = {
+#include "statecheck.inc"
+};
+static uint32_t state_passed, state_hash;
+static void state_check(long f){
+    for(unsigned k=0;k<sizeof state_targets/sizeof state_targets[0];k++) if((uint32_t)f==state_targets[k].frame){
+        uint32_t h=2166136261u;
+        for(unsigned i=0;i<2048;i++) h=(h^nes.ram[i])*16777619u;
+        state_hash=h;
+        if(h!=state_targets[k].hash){
+            state_passed|=0x80000000u;
+            for(;;) plat_set_color(0,0xF0F);
+        }
+        state_passed|=1u<<k;
+    }
+}
+#endif
+#if defined(ACCEPT_FAST) && !defined(STATECHECK)
+#error ACCEPT_FAST requires STATECHECK
+#endif
 
 static inline uint32_t e_since(uint16_t t0) { return (uint16_t)(t0 - plat_eclock()); }
 
@@ -72,14 +93,19 @@ static long f0;                        /* frame index at start (non-zero when st
 static void on_frame(long f)
 {
     uint16_t t0;
+#ifdef STATECHECK
+    state_check(f);
+#endif
     uint32_t deadline = game_base + (uint32_t)(f - f0) + 1;
     int32_t lag = (int32_t)(plat_tick_count - deadline);
 
     /* 1. pace to the game clock; when late, run on (catch-up) up to BACKLOG_MAX ticks, then drop the lag */
+#ifndef ACCEPT_FAST
     if (lag < 0) { t0 = plat_eclock(); plat_wait_ticks(deadline); st_idle += e_since(t0); lag = 0; }
     else if (lag > BACKLOG_MAX) { game_base += (uint32_t)(lag - BACKLOG_MAX); lag = BACKLOG_MAX; }
     if (lag > 0) st_late++;
     if ((uint32_t)lag > st_maxlag) st_maxlag = (uint32_t)lag;
+#endif
 
     /* 2. picture: frames decided as "not displayed" before they started (nes.ppu.draw = 0: the PPU computes only state effects, no pixels) are skipped; while behind
      * real time at most DISPLAY_SKIP_MAX frames in a row are not drawn */
@@ -100,13 +126,20 @@ static void on_frame(long f)
                                   (uint32_t)input(0, 0) | ((uint32_t)input(1, 0) << 8), 0 };
             sticky |= w[16];     /* every controller bit seen so far (input test) */
             w[17] = sticky;
-            telem_draw(plat_buf[display_back() ^ 1], w, 18, 224);
+            extern char _payload_base[];
+            w[18]=(uint32_t)_payload_base;
+#ifdef STATECHECK
+            w[19]=state_hash; w[20]=state_passed;
+#endif
+            telem_draw(plat_buf[display_back() ^ 1], w, 21, 224);
         }
 #endif
     }
 
     /* decide whether the NEXT frame is drawn: late (or still late) -> not, unless DISPLAY_SKIP_MAX frames have been skipped in a row */
-#if defined(STOP_AT) || defined(ALWAYS_DRAW)
+#if defined(ACCEPT_FAST)
+    nes.ppu.draw=((f+1)%64==0 || (uint32_t)(f+1)==state_targets[sizeof state_targets/sizeof state_targets[0]-1].frame);
+#elif defined(STOP_AT) || defined(ALWAYS_DRAW)
     nes.ppu.draw = 1;
 #else
     nes.ppu.draw = (lag > 0 && skip_run < DISPLAY_SKIP_MAX) ? 0 : 1;
@@ -120,14 +153,21 @@ static void on_frame(long f)
     /* 3. sound */
 #ifdef AUDIO_EXACT        /* exact mixer: the samples of this frame; wait for a free slot if the ring is full (the game is ahead of Paula) */
     {
+#ifdef ACCEPT_FAST
+        static int8_t test_pcm[AUD_MAX_WORDS*2];
+        int8_t *buf=test_pcm;  /* functional test: render every sample, omit hardware playback/pacing */
+#else
         int8_t *buf = audio_alloc();
         if (!buf) { t0 = plat_eclock(); do plat_wait_ticks(plat_tick_count + 1); while (!(buf = audio_alloc())); st_idle += e_since(t0); }
+#endif
         t0 = plat_eclock();
         unsigned w = audio_words_next();
         uint64_t to = nes.ppu.dots / 3 - 2;
         apu_render8(&rt_apu, a_from, to, buf, 2 * w);
         a_from = to;
+#ifndef ACCEPT_FAST
         audio_commit(w);
+#endif
         st_audio += e_since(t0);
     }
 #else                     /* cue mode: the APU state at the end of the frame programs the four Paula channels (no PCM, no ring) */
@@ -138,6 +178,12 @@ static void on_frame(long f)
         apu_cue_frame(&rt_apu, to, plat_is_pal, &cue);
         audio_cue_apply(&cue);
         st_audio += e_since(t0);
+    }
+#endif
+#ifdef ACCEPT_FAST
+    if((uint32_t)f==state_targets[sizeof state_targets/sizeof state_targets[0]-1].frame){
+        while(!shown_now && !display_frame(nes.ppu.fb,nes.ppu.rowdirty)) plat_wait_vbl();
+        for(;;) __asm__ volatile("stop #0x2000");
     }
 #endif
 #ifdef PROFILE

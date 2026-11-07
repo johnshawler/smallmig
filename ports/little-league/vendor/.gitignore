@@ -11,3 +11,6 @@ __pycache__/
 .run_*.fs-uae
 __pycache__/
 *.pyc
+
+
+.DS_Store

@@ -12,6 +12,16 @@ Date: 2026-11-07. This is a development checkpoint, not 1:1 release acceptance.
 - Final static scoreboard RGB image: zero differing pixels between Mesen frame 100,000 and runtime hook 100,000. Their indexing differs by one, but the final scene is static. This is a host picture comparison, not a native Amiga screenshot comparison.
 - Existing APU suite: 588 checks, zero failures, including the fast renderer against its straightforward reference. The new sample-boundary cache also passed these checks. Exact PAL PCM over all 6,000 Watch Game frames was byte-identical before/after that cache: SHA-256 `0047a26726da6f154ebe1883cb98587fb7b1f85cc38eb2159451ec409721b0fe` for both private streams.
 
+## Fresh native fidelity and human play
+
+- Native translated 68020 engine completed 100,001 frames, passing all 11 RAM FNV checkpoints around source frames 1,500, 6,000 and 100,000. The final hash was `0x184e22ce`, checkpoint mask `0x7ff`. This tests the native translated program and interpreter fallback against the host state, whose 2,048 RAM bytes also matched fresh Mesen checkpoints.
+- Full-match test allocated Fast RAM dynamically at `0x20dcd0`, using 2 MiB Chip + 4 MiB Fast. The final scoreboard matched all 57,344 compared pixels; the bottom 16 lines contained diagnostic telemetry and were excluded. This accelerated acceptance harness draws one in 64 frames and renders exact PCM to scratch, without Paula playback; its zero audio counters are not playback evidence.
+- Separate native no-telemetry scenes compared every one of 61,440 pixels: PAL menu frame 100, batting frame 1,500 and field frame 2,000; NTSC batting frame 1,500. All four had zero differences and uniform 2x2 display scaling. These are native screenshots against host reference frames, rather than all frames of every game.
+- Exact 8-bit PCM lookup conversion remained byte-identical across 6,000 frames in both standards. PAL SHA-256: `0047a26726da6f154ebe1883cb98587fb7b1f85cc38eb2159451ec409721b0fe`; NTSC: `bccdc2ae0bb1cea6becef56b81aa2c27b69c16534b1dc3de88573c6472d6ff7c`.
+- Human NTSC play used 68020 fast CPU mode, no JIT, 2 MiB Chip + 4 MiB Fast. Exhibition, team selection, bat toss, lineup editing, pitching, hit-to-field transition, fielding and next batter were observed. Controller input was live, with no scripted test input. Lineup commands cycle using Left/Right; choose End to begin the inning.
+- Over a continuous 3,766-frame gameplay interval, the game clock, executed source frames and played PCM chunks each increased by exactly 3,766. New audio underruns: zero; new dropped APU events: zero. Five display deadlines were skipped during that interval. There were 16 cumulative audio underruns before the interval, so this does not establish flawless startup or transition playback. Audio playback was checked through DMA counters, not a listening assessment.
+- Relocation tool proof: 9,701 fixups from a high-memory test image produced a byte-identical result to an independent relink at another base, with the private ROM placeholder excluded consistently. The clean player build uses 9,595 relocations and requests 2,754,656 bytes of Fast RAM.
+
 ## Native performance
 
 Measured in FS-UAE with JIT disabled and CPU/memory/blitter cycle timing enabled. Source-frame profiling interval `[1600,2200)`; rates are approximate because the interval endpoints are sampled by the profiler interrupt.
@@ -22,15 +32,17 @@ Measured in FS-UAE with JIT disabled and CPU/memory/blitter cycle timing enabled
 | Same stock profile, original exact APU mixer | 1,835 | about 32.7% |
 | Same stock profile, cached exact PCM sample boundaries | 1,778 | about 33.7% |
 
-The exact mixer category decreased from about 11.0 to 9.2 ms per source frame. Exact sound still underruns badly at the current overall speed. The display skips frames while behind. Neither satisfies 1:1 acceptance.
+The exact mixer category decreased from about 11.0 to 9.2 ms per source frame. With stock timing, exact sound still underruns and display frames are skipped. This does not satisfy 1:1 acceptance. The fast CPU playtest results above are separate.
 
-An explicit 50 MHz 68030 profile with the same Z2 memory reached about 43.4% with the original exact mixer. That is not a test of accelerator-local Fast RAM. A Blizzard 1230 IV profile was blocked by missing expansion boot firmware. The build now supports a selected fast-memory link address through `FAST_BASE`; higher-memory configurations remain experimental until separately booted and measured. The default wrapper retains the stock A1200 memory profile.
+Additional timed profiles reached about 44.9% on 50 MHz 68030 with Z3 memory/cache startup, 66.3% on 25 MHz 68040 and 75.6% on 50 MHz 68060. These are FS-UAE measurements, not physical accelerator certification. The 68060 startup was booted with its PCR and caches enabled; the timing result did not improve. Optional CPU-specific startup paths remain experimental.
+
+The default wrapper now allocates Fast RAM dynamically and writes an explicitly fast CPU FS-UAE profile with JIT disabled. `--stock-timing` is a diagnostic option. Neither the faster profile nor changing the hardware target resolves stock-speed acceptance.
 
 ## Remaining acceptance gates
 
 1. Full original speed and uninterrupted exact audio on a clearly declared hardware profile.
-2. Fresh native graphics comparison across gameplay and transitions, including mid-frame palettes.
-3. Human batting, pitching, fielding, baserunning and two-player controller testing; complete native matches and restarts.
-4. Release ADF identity, repeatable private build and documented hardware requirements.
+2. Broader native graphics comparison across transitions and mid-frame palettes beyond the four pixel-exact scenes.
+3. Human batting, baserunning and two-player controller testing; human full matches and restarts. CPU native full-match, live pitching and fielding have passed the checks described above.
+4. Uninterrupted startup/transition audio and every-frame display timing; physical hardware validation. The clean ADF is built reproducibly from private input with documented memory requirements, but remains a development candidate.
 
 Historical results in `vendor/docs/` belong to the pinned upstream project. They are not substituted for fresh checks here. Cartridge, firmware, decoded graphics, generated ADFs and raw reference captures are excluded from public source.
