@@ -28,6 +28,8 @@ Controls in the supplied profile:
 - Return: Start.
 - Space: Select.
 
+Add `--two-player` when generating the profile to enable a second keyboard controller: WASD directions, F for A, G for B. Choose 2P in the original Exhibition menu. Both controller ports, batter movement, pitching and a timed human swing producing a hit were exercised in this configuration.
+
 Physical hardware uses joystick port 2 with its second button, plus keyboard Start/Select. Reset or quit the emulator to leave the game.
 
 Only the verified USA cartridge is accepted: SHA-256 `f33ee3c2cdf4cb23bb060574234fa6ebb45ac0c7dea1f910d1b86c0e42990c23`. Cartridge bytes, generated game assets, ADFs and Kickstart remain private and are excluded from public source.

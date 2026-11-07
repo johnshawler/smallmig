@@ -58,7 +58,8 @@ def build(args):
         config = ('[fs-uae]\namiga_model = A1200\ncpu = 68EC020\nchip_memory = 2048\n'
                   'fast_memory = 4096\nslow_memory = 0\nfloppy_drive_count = 1\n'
                   'floppy_drive_speed = 0\nfloppy_drive_volume = 0\n'
-                  'joystick_port_1 = keyboard\njoystick_port_0 = none\n'
+                  'joystick_port_1 = keyboard\n'
+                  f'joystick_port_0 = {"keyboard" if args.two_player else "none"}\n'
                   'keyboard_key_x = action_joy_1_2nd_button\n'
                   'keyboard_key_z = action_joy_1_fire_button\n'
                   'uae_cachesize = 0\nuae_blitter_cycle_exact = true\n'
@@ -69,6 +70,11 @@ def build(args):
                   'video_sync = off\nfullscreen = 0\nwindow_width = 768\nwindow_height = 576\n'
                   'automatic_input_grab = 1\n'
                   f'kickstart_file = {ks}\nfloppy_drive_0 = {disk}\nbase_dir = {out/"fs-uae"}\n')
+        if args.two_player:
+            config += ('keyboard_key_f = action_joy_0_fire_button\n'
+                       'keyboard_key_g = action_joy_0_2nd_button\n'
+                       'keyboard_key_w = action_joy_0_up\nkeyboard_key_s = action_joy_0_down\n'
+                       'keyboard_key_a = action_joy_0_left\nkeyboard_key_d = action_joy_0_right\n')
         (out/'Little-League.fs-uae').write_text(config)
     print(json.dumps(report, indent=2))
 
@@ -78,6 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--rom', required=True)
     parser.add_argument('--kickstart', help='Also write a local FS-UAE player configuration')
     parser.add_argument('--cue-audio', action='store_true', help='Diagnostic faster approximate sound mode')
+    parser.add_argument('--two-player', action='store_true', help='Map player two to WASD, F and G in the FS-UAE profile')
     parser.add_argument('--stock-timing', action='store_true', help='Write a hardware-speed diagnostic profile instead of the fast CPU playtest profile')
     parser.add_argument('--standard', choices=('ntsc', 'pal'), default='ntsc', help='Video standard for the generated FS-UAE profile')
     build(parser.parse_args())

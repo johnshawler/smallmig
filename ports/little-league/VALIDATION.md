@@ -20,6 +20,8 @@ Date: 2026-11-07. This is a development checkpoint, not 1:1 release acceptance.
 - Exact 8-bit PCM lookup conversion remained byte-identical across 6,000 frames in both standards. PAL SHA-256: `0047a26726da6f154ebe1883cb98587fb7b1f85cc38eb2159451ec409721b0fe`; NTSC: `bccdc2ae0bb1cea6becef56b81aa2c27b69c16534b1dc3de88573c6472d6ff7c`.
 - Human NTSC play used 68020 fast CPU mode, no JIT, 2 MiB Chip + 4 MiB Fast. Exhibition, team selection, bat toss, lineup editing, pitching, hit-to-field transition, fielding and next batter were observed. Controller input was live, with no scripted test input. Lineup commands cycle using Left/Right; choose End to begin the inning.
 - Over a continuous 3,766-frame gameplay interval, the game clock, executed source frames and played PCM chunks each increased by exactly 3,766. New audio underruns: zero; new dropped APU events: zero. Five display deadlines were skipped during that interval. There were 16 cumulative audio underruns before the interval, so this does not establish flawless startup or transition playback. Audio playback was checked through DMA counters, not a listening assessment.
+- Clean player ADF two-player check: both controller ports independently confirmed their teams and lineups. WASD/F/G controlled player two while Arrows/Z/X controlled player one. Batter position movement, a human pitch, and a timed human swing resulting in a hit with the ensuing ball/runner field view were observed. This is not a full human two-player match or manual baserunning acceptance.
+- A 100 MHz 68060 timing profile reached about 82.8% (725 ticks for the same 600 source frames), still below full original speed. It does not change the default requirements or establish physical accelerator performance.
 - Relocation tool proof: 9,701 fixups from a high-memory test image produced a byte-identical result to an independent relink at another base, with the private ROM placeholder excluded consistently. The clean player build uses 9,595 relocations and requests 2,754,656 bytes of Fast RAM.
 
 ## Native performance
@@ -42,7 +44,7 @@ The default wrapper now allocates Fast RAM dynamically and writes an explicitly 
 
 1. Full original speed and uninterrupted exact audio on a clearly declared hardware profile.
 2. Broader native graphics comparison across transitions and mid-frame palettes beyond the four pixel-exact scenes.
-3. Human batting, baserunning and two-player controller testing; human full matches and restarts. CPU native full-match, live pitching and fielding have passed the checks described above.
+3. Human baserunning, complete two-player matches, and human full matches/restarts. CPU native full-match, live pitching/fielding, batter movement and two-player hit controls have passed the checks described above.
 4. Uninterrupted startup/transition audio and every-frame display timing; physical hardware validation. The clean ADF is built reproducibly from private input with documented memory requirements, but remains a development candidate.
 
 Historical results in `vendor/docs/` belong to the pinned upstream project. They are not substituted for fresh checks here. Cartridge, firmware, decoded graphics, generated ADFs and raw reference captures are excluded from public source.
