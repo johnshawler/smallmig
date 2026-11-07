@@ -155,6 +155,9 @@ int ar2_build(uint32_t *list, unsigned max, const ArFrame *f, const Ar2Mem *m)
             unsigned N = (unsigned)r->bytex * 8 + r->fx, rr = N & (AR2_FETCH_PIXELS-1), w0, s;
             unsigned mask = 512/AR2_FETCH_PIXELS-1;
             if (rr == 0) { w0 = ((N >> AR2_FETCH_SHIFT) + mask) & mask; s = 0; } else { w0 = N >> AR2_FETCH_SHIFT; s = AR2_FETCH_PIXELS - rr; }
+#ifdef AR2_FETCH32
+            if (s >= 16) w0 = (w0 + mask) & mask;
+#endif
             for (unsigned k = 0; k < 4; k++) { np[2 * k] = (uint32_t)BG(r->cfg, k, r->row0) + AR2_PAD_BYTES * w0; np[2 * k + 1] = (uint32_t)SP(k, y0) - AR2_PAD_BYTES; }
             mod1 = (uint16_t)(m->brow - AR2_FETCH_BYTES); mod2 = (uint16_t)(32 - AR2_FETCH_BYTES);
             con1 = (uint16_t)((s&15)|((s&0x30)<<6));
