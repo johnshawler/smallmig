@@ -2,8 +2,10 @@
 OUT=../../build/xlt
 CC=m68k-linux-gnu-gcc
 AS=m68k-linux-gnu-as
+QEMU=qemu-m68k
+QEMUFLAGS=-cpu m68020
 all: $(OUT)/xl_unit
-	qemu-m68k -cpu m68020 $(OUT)/xl_unit $(OUT) $(TRIALS)
+	$(QEMU) $(QEMUFLAGS) $(OUT)/xl_unit $(OUT) $(TRIALS)
 $(OUT)/code.s $(OUT)/tab.s $(OUT)/prg.bin $(OUT)/tests.txt: gen.py ../../translator/x65.py ../../translator/opinfo.py
 	python3 gen.py $(OUT)
 $(OUT)/xl_unit: $(OUT)/code.s $(OUT)/tab.s xl_unit.s xl_unit.c ../../runtime/cpu6502.c

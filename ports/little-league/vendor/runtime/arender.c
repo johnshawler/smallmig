@@ -133,6 +133,7 @@ static int resnap; static int ndisp;
 static void render_region(Nes*n,const ArRegion*r);
 static void hw_region(Nes*n,const ArRegion*r);
 static uint8_t xdone[240]; static uint8_t sl_cnt[240], sl_idx[240][8]; static int sl_valid, sl_h;
+static uint8_t sl_y[64]; static int sl_saved;
 long ar_st_nt_flush, ar_st_nt_conv;
 void ar_begin_frame(Nes*n){
     ar_scene.nreg=0; ar_scene.overflow=0; resnap=0; ndisp=0; ar_set(ar_scene.exact,0,sizeof ar_scene.exact); ar_cpy(ar_scene.oam,n->ppu.oam,256);
@@ -280,11 +281,22 @@ static void hw_encode_row(int y){
     xdone[y]=1;
 }
 static __attribute__((noinline)) void hw_build_lists(int h){
+    /* X, pattern, palette and flip changes do not alter scanline membership.
+     * Keep the native sprite lists across frames when all Y coordinates and
+     * the sprite height match. OAM changes mid-frame use this same guard. */
+#ifndef AR_NOLISTCACHE
+    if(sl_saved && sl_h==h){
+        int same=1;
+        for(int i=0;i<64;i++) if(sl_y[i]!=ar_scene.oam[i*4]){ same=0; break; }
+        if(same){ sl_valid=1; return; }
+    }
+#endif
+    for(int i=0;i<64;i++) sl_y[i]=ar_scene.oam[i*4];
     ar_set(sl_cnt,0,sizeof sl_cnt);
     for(int i=0;i<64;i++){ int sy=ar_scene.oam[i*4]; if(sy>=239) continue;
         int e1=sy+h; if(e1>239) e1=239;
         for(int e=sy;e<e1;e++) if(sl_cnt[e]<8) sl_idx[e][sl_cnt[e]++]=(uint8_t)i; }
-    sl_valid=1; sl_h=h;
+    sl_valid=1; sl_h=h; sl_saved=1;
 }
 /* the sprite layer line y of the background region s (cover of the clipped background, then the sprites) */
 static uint32_t hw_used, tmpsg[12];

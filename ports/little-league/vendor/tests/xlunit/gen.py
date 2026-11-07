@@ -71,6 +71,14 @@ for a in (0x0030,0x0200,0x07FE):
     add([0x6C,a&0xFF,a>>8],'jmpind',f'JMP ind {a:04x}')
 add([],'', 'RTS only')
 add([0x40],'rti','RTI')
+# Stable I/O bursts must remain one native block while preserving every bus
+# timestamp, live flags, and the final register/memory state.
+for reg,op in [('A',0x8D),('X',0x8E),('Y',0x8C)]:
+    for addr in [0x2003,0x2004,0x2005,0x2006,0x2007,0x200F,0x4000,0x4015,0x4016,0x4017]:
+        add([0xA9,0x80,op,addr&255,addr>>8,0xA2,3,op,addr&255,addr>>8,
+             0xE8,op,addr&255,addr>>8,0x08,0x68],'io',f'IO burst {reg} {addr:04x}')
+for addr in [0x2002,0x4016,0x4017]:
+    add([0xA9,0x55,0x8D,5,0x20,0xAD,addr&255,addr>>8,0x8D,7,0x20],'io',f'IO read {addr:04x}')
 # random sequences (exercise the flag liveness / fusion paths): forward branches only, RAM/ROM operands, no stack or control transfers
 import random as _r
 _r.seed(777)

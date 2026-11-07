@@ -41,6 +41,14 @@ def ctx_of(cur_ctx,addr):
 COND={'BPL':('N',0),'BMI':('N',1),'BNE':('Z',0),'BEQ':('Z',1),'BCC':('C',0),'BCS':('C',1),'BVC':('V',0),'BVS':('V',1)}
 TERM_JMP={'JMP','RTS','RTI','BRK'}
 IO_TERM_ADDR={0x2000,0x4014}      # stores that must end the superblock (they can change event times)
+COALESCE_IO=os.environ.get('XL_COALESCE_IO','1')!='0'
+DIRECT_IO=os.environ.get('XL_DIRECT_IO','1')!='0'
+
+def stable_io_store(a):
+    # These stores cannot change the CPU event deadline or the PRG mapping.
+    # Reserve the entire native block's cycles before entering it; keep the
+    # precise access-cycle adjustment on every individual runtime call.
+    return (0x2000<=a<0x4000 and (a&7)>=3) or (0x4000<=a<=0x4017 and a!=0x4014)
 
 class Prog:
     def __init__(self,rom,seen):
@@ -87,6 +95,7 @@ COND_B=set(COND)
 def is_io_term(i):
     """instructions after which a new superblock must start because they may change event times / mapper state"""
     if i.m in ('STA','STX','STY'):
+        if COALESCE_IO and i.mode=='abs' and stable_io_store(i.arg): return False
         if i.mode=='abs' and (i.arg in IO_TERM_ADDR or i.arg>=0x8000 or 0x2000<=i.arg<0x8000): return True
         if i.mode in('zp','zpx','zpy'): return False
         if i.mode=='abs': return False
@@ -254,12 +263,14 @@ class Gen:
     def setv(self):
         if self.i.live&V: self.e('svs d7'); self.e(f'move.b d7,({CTX_V},a2)')
     # ------------------------------------------------------------------ memory access
-    def helper_rd(self,idx,hi=None):
+    def helper_rd(self,idx,hi=None,addr=None):
         """read via the runtime; hi = high byte of the operand address when known: it is the last value on the bus before the read (open bus)"""
         if hi is not None: self.e(f'move.b #{hi},(3,a2)')
-        self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr rt_rd'); return 'd6'
-    def helper_wr(self,idx):
-        self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr rt_wr')
+        target=('rt_rd_joy0' if addr==0x4016 else 'rt_rd_joy1') if DIRECT_IO and addr in (0x4016,0x4017) else 'rt_rd'
+        self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr '+target); return 'd6'
+    def helper_wr(self,idx,addr=None):
+        target='rt_wr_mmc1' if DIRECT_IO and addr is not None and addr>=0x8000 else 'rt_wr'
+        self.e(f'move.w #{self.adj(idx)},({CTX_ADJ},a2)'); self.e('jsr '+target)
     def penalty_idx(self,reg,lo):
         if lo==0: return
         l=self.newlab(); self.e(f'cmp.b #{256-lo},{reg}'); self.e(f'bcs.s {l}'); self.e('subq.l #1,d5'); self.cur.append(l+':')
@@ -285,7 +296,7 @@ class Gen:
             if r=='ram': return f'({a&0x7FF},a0)'
             if r=='win': return f'({a-0x8000},a1)'
             if r=='fix': return f'({a-0x8000},a6)'
-            self.e(f'move.w #0x{a:X},d7'); return self.helper_rd(bc,a>>8)
+            self.e(f'move.w #0x{a:X},d7'); return self.helper_rd(bc,a>>8,a)
         if m in('abx','aby'):
             ir='d1' if m=='abx' else 'd2'; r=region(a)
             if pen: self.penalty_idx(ir,a&0xFF)
@@ -313,7 +324,7 @@ class Gen:
         elif m in('abx','aby'): self.e(f'move.w #0x{a:X},d7'); self.e(f'add.w {"d1" if m=="abx" else "d2"},d7')
         elif m=='izy': self.ptr_load(a); self.e('add.w d2,d7')
         else: raise NotImplementedError(m)
-        self.e(f'move.b {reg},d6'); self.helper_wr(bc)
+        self.e(f'move.b {reg},d6'); self.helper_wr(bc,a if m=='abs' else None)
     # ------------------------------------------------------------------ stack / control
     def push_byte(self,src): self.e(f'move.b {src},(0x100,a0,d3.w)'); self.e('subq.b #1,d3')
     def pull_byte(self,dst): self.e('addq.b #1,d3'); self.e(f'move.b (0x100,a0,d3.w),{dst}')

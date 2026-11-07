@@ -930,6 +930,22 @@ void ppu_fp_run(Nes*n,uint64_t target){
         uint64_t distance=target-p->dots;
         uint32_t room=distance>0xFFFFFFFFull?0xFFFFFFFFu:(uint32_t)distance;
         int trans = p->need_update || p->upd_delay || p->rend!=p->rend_prev; if(trans) CNT(ppu_cnt_trans);
+        /* After the vblank edge, nothing in the blank scanlines changes until
+         * pre-render. VRAM/OAM upload loops synchronise here on every store.
+         * Advance their position directly instead of visiting every line/piece.
+         * Pending register updates, the input poll, NMI edge and pre-render
+         * boundary retain the general path. Absolute time is still 64-bit. */
+#ifndef FP_NOBLANKSPAN
+        if(!trans && L>=241 && (L>241 || c>=1)){
+            unsigned left=(unsigned)(261-L)*341u-(unsigned)c-1u;
+            if(distance<=left){
+                unsigned pos=(unsigned)c+room, lines=pos/341u;
+                p->dots=target; p->line+=(int)lines; p->cx=(int)(pos-lines*341u);
+                if(lines){ p->fc[0].y=p->fc[1].y=-1; p->fcur=0; }
+                return;
+            }
+        }
+#endif
         if(c==340){
             if(!trans && room>=341){
                 int m=0;

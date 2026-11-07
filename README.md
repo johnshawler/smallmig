@@ -55,3 +55,8 @@ The earlier [batting experiment](experiments/little-league/README.md) is retaine
 ## Little League Baseball original engine
 
 The [full-game port](ports/little-league/README.md) now uses the original cartridge program through the existing static translator, PPU/MMC1 runtime, planar renderer and APU mixer. It builds a private bootable ADF. The earlier batting prototype is retained as an experiment. Full-speed 1:1 acceptance on the declared A1200 remains open.
+
+
+## Headless cloud tests
+
+[Headless execution](environment/HEADLESS.md) installs and runs Mesen and FS-UAE on a bounded GitHub-hosted Linux runner. Public runs use original fixtures and test firmware. Full-game private inputs remain separate.

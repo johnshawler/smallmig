@@ -35,4 +35,20 @@ bad = (exp != got)
 print('%s: %d pixels differ' % (os.path.basename(shot), int(bad.sum())))
 rows = np.nonzero(bad.any(axis=1))[0]
 if len(rows): print('differing lines:', rows[:20].tolist(), '... first x:', np.nonzero(bad[rows[0]])[0][:8].tolist())
+if len(rows):
+    for i,(y0,y1,kind,cfg,row0,bytex,fx,pv) in enumerate(T):
+        count=int(bad[y0:y1+1].sum())
+        if not count: continue
+        print('region',i,'lines',y0,y1,'bad',count,'first-row-bad',np.nonzero(bad[y0])[0].tolist())
+        if kind==BG:
+            pal=[((e*11+9+5*pv)&63) if pv>=6 else ((e*7+3+(5*pv if e%8==pv%8 else 0)+(i if e==17 else 0))&63) for e in range(32)]
+            scores=[]
+            for dx in range(-64,65):
+                n=0
+                for x in range(256):
+                    b=bgv(cfg,row0,(bytex*8+fx+x+dx)%512);s=spv(y0,x)
+                    e=(16+s if s&3 else 0) if s else (b if b&3 else 0)
+                    n+=int(nes[pal[e]]!=got[y0,x])
+                scores.append((n,dx))
+            print('best-background-shifts',sorted(scores)[:5])
 sys.exit(0 if not bad.any() else 1)

@@ -100,18 +100,6 @@ leave:
     struct.pack_into('>I', block, len(block)-24, (~total) & 0xFFFFFFFF)
     firmware = OUT/'original-test-firmware.rom'
     firmware.write_bytes(block)
-    lua = OUT/'fs-uae.lua'
-    # UAE's Lua state has only its explicit API, so no os/io/string libraries needed.
-    lua.write_text('''local vsync=0
-function on_uae_vsync()
- vsync=vsync+1
- if vsync%100==0 then uae_log('SMALLMIG_VSYNC '..vsync..'\\n') end
- if uae_read_u16(0x600)==0x534d and uae_read_u16(0x602)==0x4947 then
-  local count=uae_read_u16(0x606)
-  if count>=5 and count<=10 then uae_log('SMALLMIG_NATIVE frames='..count..'\\n') end
- end
-end
-''')
     base = OUT/'fs-uae'
     cfg = OUT/'native.fs-uae'
     cfg.write_text(f'''[fs-uae]
