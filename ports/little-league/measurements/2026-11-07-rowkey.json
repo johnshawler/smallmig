@@ -1,0 +1,1032 @@
+{
+  "experiment": "compact-exact-sprite-row-key",
+  "status": "retained opt-in: target renderer fixture improved; complete player deadline acceptance remains open",
+  "source_timeline_hz": 60.0988,
+  "pal_presentation_separate": true,
+  "baseline": {
+    "adf_sha256": "9f4dc97745204d4d422dbadf30f7890f5fdf51f64469f8d7047326eb77ddb67b",
+    "mode": "32-bit AGA DMA, exact PCM, legacy row key, AR_CACHE_STATS"
+  },
+  "candidate": {
+    "adf_sha256": "304fbb7b631defb6784cb7231f6e5ce0af404205598b3c456f85e2135aac577b",
+    "mode": "same baseline plus AR_COMPACT_ROWKEY"
+  },
+  "input_sha256": "d56dbffdf0a213720e5ef237bc5faf2762fd97bf57163f44f59eda4d32b4597b",
+  "native_profile": {
+    "rowkey-baseline": {
+      "profile": {
+        "frame_window": [
+          2000,
+          2200
+        ],
+        "core_cycles": 176760193,
+        "core_cycles_per_frame": 883800.965,
+        "categories": {
+          "renderer": {
+            "core_cycles": 73996940,
+            "percent": 41.8628983959075
+          },
+          "PPU": {
+            "core_cycles": 28150670,
+            "percent": 15.925910422602898
+          },
+          "translated": {
+            "core_cycles": 23904240,
+            "percent": 13.523542599888426
+          },
+          "time_model": {
+            "core_cycles": 10984098,
+            "percent": 6.214124240065749
+          },
+          "APU": {
+            "core_cycles": 10493064,
+            "percent": 5.93632753048646
+          },
+          "test_hook": {
+            "core_cycles": 8716840,
+            "percent": 4.931449695803399
+          },
+          "dispatch": {
+            "core_cycles": 7314156,
+            "percent": 4.137897722254693
+          },
+          "helpers": {
+            "core_cycles": 5207164,
+            "percent": 2.945891782320016
+          },
+          "interpreter_mapper": {
+            "core_cycles": 5148441,
+            "percent": 2.9126699358152432
+          },
+          "platform_display": {
+            "core_cycles": 2808180,
+            "percent": 1.5886948030204968
+          },
+          "other": {
+            "core_cycles": 36400,
+            "percent": 0.020592871835119573
+          }
+        },
+        "top_functions": [
+          {
+            "name": "hw_line.constprop.0",
+            "core_cycles": 39834302,
+            "percent": 22.53578779471009
+          },
+          {
+            "name": "ensure_trow",
+            "core_cycles": 14192050,
+            "percent": 8.02898534965958
+          },
+          {
+            "name": "test_hook",
+            "core_cycles": 8716840,
+            "percent": 4.931449695803399
+          },
+          {
+            "name": "hw_region",
+            "core_cycles": 7860538,
+            "percent": 4.447006911788108
+          },
+          {
+            "name": "ppu_fp_run",
+            "core_cycles": 6429520,
+            "percent": 3.637425311025769
+          },
+          {
+            "name": "fp_piece",
+            "core_cycles": 5617188,
+            "percent": 3.177858037301419
+          },
+          {
+            "name": "fetch_tile",
+            "core_cycles": 4920659,
+            "percent": 2.7838049486628473
+          },
+          {
+            "name": "xrt_wr_c",
+            "core_cycles": 4359811,
+            "percent": 2.466511789789684
+          },
+          {
+            "name": "core8_edges.constprop.0",
+            "core_cycles": 4100988,
+            "percent": 2.3200857220154765
+          },
+          {
+            "name": "ar_log_region",
+            "core_cycles": 3803512,
+            "percent": 2.1517921741576735
+          },
+          {
+            "name": "ar_end_frame",
+            "core_cycles": 3131186,
+            "percent": 1.771431648074745
+          },
+          {
+            "name": "bus_rd",
+            "core_cycles": 2600904,
+            "percent": 1.4714308441607098
+          },
+          {
+            "name": "rt_wr_mmc1",
+            "core_cycles": 2464974,
+            "percent": 1.3945300455742318
+          },
+          {
+            "name": "hw_build_lists",
+            "core_cycles": 2444086,
+            "percent": 1.3827129052750016
+          },
+          {
+            "name": "lt_build",
+            "core_cycles": 2368528,
+            "percent": 1.339966855546486
+          },
+          {
+            "name": "memcpy",
+            "core_cycles": 2252850,
+            "percent": 1.2745233877403608
+          },
+          {
+            "name": "v_adv",
+            "core_cycles": 2146007,
+            "percent": 1.2140782172601496
+          },
+          {
+            "name": "rt_wr_gen",
+            "core_cycles": 1919426,
+            "percent": 1.0858926817306656
+          },
+          {
+            "name": "rt_sync",
+            "core_cycles": 1877963,
+            "percent": 1.0624354772004576
+          },
+          {
+            "name": "update.constprop.0",
+            "core_cycles": 1798610,
+            "percent": 1.0175424508616597
+          },
+          {
+            "name": "next_vl",
+            "core_cycles": 1759367,
+            "percent": 0.9953411852180994
+          },
+          {
+            "name": "mem_read",
+            "core_cycles": 1647343,
+            "percent": 0.9319649249308073
+          },
+          {
+            "name": "sq_sync",
+            "core_cycles": 1611404,
+            "percent": 0.9116328584230501
+          },
+          {
+            "name": "lt_build_full",
+            "core_cycles": 1553504,
+            "percent": 0.8788766144875164
+          },
+          {
+            "name": "F_C384",
+            "core_cycles": 1402562,
+            "percent": 0.7934829534837632
+          },
+          {
+            "name": "mmc1_write",
+            "core_cycles": 1378856,
+            "percent": 0.780071562832023
+          },
+          {
+            "name": "render.part.0",
+            "core_cycles": 1274061,
+            "percent": 0.720785024261656
+          },
+          {
+            "name": "rt_rd",
+            "core_cycles": 1272858,
+            "percent": 0.72010444116227
+          },
+          {
+            "name": "rt_compute_limit_at",
+            "core_cycles": 1075662,
+            "percent": 0.608543123733747
+          },
+          {
+            "name": "noi_sync",
+            "core_cycles": 991029,
+            "percent": 0.5606629995023823
+          },
+          {
+            "name": "rt_disp",
+            "core_cycles": 990192,
+            "percent": 0.560189476597822
+          },
+          {
+            "name": "draw_range",
+            "core_cycles": 988369,
+            "percent": 0.5591581357913543
+          },
+          {
+            "name": "ppu_reg_write",
+            "core_cycles": 941497,
+            "percent": 0.5326408531359773
+          },
+          {
+            "name": "apu_run_to",
+            "core_cycles": 918471,
+            "percent": 0.5196141644855524
+          },
+          {
+            "name": "B5_9847",
+            "core_cycles": 895912,
+            "percent": 0.5068516755919134
+          },
+          {
+            "name": "cpu_step",
+            "core_cycles": 874930,
+            "percent": 0.49498135589838377
+          },
+          {
+            "name": "mem_write",
+            "core_cycles": 867368,
+            "percent": 0.4907032433484614
+          },
+          {
+            "name": "F_CEF9",
+            "core_cycles": 866400,
+            "percent": 0.4901556087348241
+          },
+          {
+            "name": "ppu_wr",
+            "core_cycles": 827344,
+            "percent": 0.4680601361416255
+          },
+          {
+            "name": "ar_begin_frame",
+            "core_cycles": 817200,
+            "percent": 0.462321287463179
+          }
+        ],
+        "scope": "CPU-only Musashi attribution, no Amiga bus contention or display DMA; test_hook includes PCM hashing absent from player"
+      },
+      "result": {
+        "native_frames": 2201,
+        "checkpoints": 4,
+        "pcm_fnv32": 2010928262,
+        "core_cycles": 2158308344,
+        "amiga_speed_certified": false,
+        "sprite_cache": {
+          "calls": 172666,
+          "hits": 132243,
+          "misses": 40423,
+          "oam_words": 584383
+        }
+      }
+    },
+    "rowkey-candidate": {
+      "profile": {
+        "frame_window": [
+          2000,
+          2200
+        ],
+        "core_cycles": 170818314,
+        "core_cycles_per_frame": 854091.57,
+        "categories": {
+          "renderer": {
+            "core_cycles": 68055061,
+            "percent": 39.84061158688172
+          },
+          "PPU": {
+            "core_cycles": 28150670,
+            "percent": 16.479889855369958
+          },
+          "translated": {
+            "core_cycles": 23904240,
+            "percent": 13.99395617498016
+          },
+          "time_model": {
+            "core_cycles": 10984098,
+            "percent": 6.430281240218775
+          },
+          "APU": {
+            "core_cycles": 10493064,
+            "percent": 6.142821430727855
+          },
+          "test_hook": {
+            "core_cycles": 8716840,
+            "percent": 5.102989132652369
+          },
+          "dispatch": {
+            "core_cycles": 7314156,
+            "percent": 4.281833621188885
+          },
+          "helpers": {
+            "core_cycles": 5207164,
+            "percent": 3.048364006215399
+          },
+          "interpreter_mapper": {
+            "core_cycles": 5148441,
+            "percent": 3.0139865447916785
+          },
+          "platform_display": {
+            "core_cycles": 2808180,
+            "percent": 1.643957216437577
+          },
+          "other": {
+            "core_cycles": 36400,
+            "percent": 0.021309190535623714
+          }
+        },
+        "top_functions": [
+          {
+            "name": "hw_line.constprop.0",
+            "core_cycles": 33892423,
+            "percent": 19.841211522553724
+          },
+          {
+            "name": "ensure_trow",
+            "core_cycles": 14192050,
+            "percent": 8.30827191046974
+          },
+          {
+            "name": "test_hook",
+            "core_cycles": 8716840,
+            "percent": 5.102989132652369
+          },
+          {
+            "name": "hw_region",
+            "core_cycles": 7860538,
+            "percent": 4.6016951086404
+          },
+          {
+            "name": "ppu_fp_run",
+            "core_cycles": 6429520,
+            "percent": 3.7639523827638293
+          },
+          {
+            "name": "fp_piece",
+            "core_cycles": 5617188,
+            "percent": 3.288399158418107
+          },
+          {
+            "name": "fetch_tile",
+            "core_cycles": 4920659,
+            "percent": 2.8806390162591113
+          },
+          {
+            "name": "xrt_wr_c",
+            "core_cycles": 4359811,
+            "percent": 2.552308881821653
+          },
+          {
+            "name": "core8_edges.constprop.0",
+            "core_cycles": 4100988,
+            "percent": 2.4007894141842425
+          },
+          {
+            "name": "ar_log_region",
+            "core_cycles": 3803512,
+            "percent": 2.226641810783825
+          },
+          {
+            "name": "ar_end_frame",
+            "core_cycles": 3131186,
+            "percent": 1.8330505240790516
+          },
+          {
+            "name": "bus_rd",
+            "core_cycles": 2600904,
+            "percent": 1.5226142555182929
+          },
+          {
+            "name": "rt_wr_mmc1",
+            "core_cycles": 2464974,
+            "percent": 1.4430384788834762
+          },
+          {
+            "name": "hw_build_lists",
+            "core_cycles": 2444086,
+            "percent": 1.4308102818530337
+          },
+          {
+            "name": "lt_build",
+            "core_cycles": 2368528,
+            "percent": 1.386577319806587
+          },
+          {
+            "name": "memcpy",
+            "core_cycles": 2252850,
+            "percent": 1.3188574147851617
+          },
+          {
+            "name": "v_adv",
+            "core_cycles": 2146007,
+            "percent": 1.2563096718072044
+          },
+          {
+            "name": "rt_wr_gen",
+            "core_cycles": 1919426,
+            "percent": 1.1236652294788485
+          },
+          {
+            "name": "rt_sync",
+            "core_cycles": 1877963,
+            "percent": 1.099392071039877
+          },
+          {
+            "name": "update.constprop.0",
+            "core_cycles": 1798610,
+            "percent": 1.0529374502548947
+          },
+          {
+            "name": "next_vl",
+            "core_cycles": 1759367,
+            "percent": 1.0299639182716673
+          },
+          {
+            "name": "mem_read",
+            "core_cycles": 1647343,
+            "percent": 0.9643831281463181
+          },
+          {
+            "name": "sq_sync",
+            "core_cycles": 1611404,
+            "percent": 0.9433438149963241
+          },
+          {
+            "name": "lt_build_full",
+            "core_cycles": 1553504,
+            "percent": 0.9094481520289446
+          },
+          {
+            "name": "F_C384",
+            "core_cycles": 1402562,
+            "percent": 0.8210840905501503
+          },
+          {
+            "name": "mmc1_write",
+            "core_cycles": 1378856,
+            "percent": 0.8072061875051642
+          },
+          {
+            "name": "render.part.0",
+            "core_cycles": 1274061,
+            "percent": 0.7458573792034969
+          },
+          {
+            "name": "rt_rd",
+            "core_cycles": 1272858,
+            "percent": 0.7451531221646409
+          },
+          {
+            "name": "rt_compute_limit_at",
+            "core_cycles": 1075662,
+            "percent": 0.6297111678552219
+          },
+          {
+            "name": "noi_sync",
+            "core_cycles": 991029,
+            "percent": 0.5801655436079295
+          },
+          {
+            "name": "rt_disp",
+            "core_cycles": 990192,
+            "percent": 0.5796755493090747
+          },
+          {
+            "name": "draw_range",
+            "core_cycles": 988369,
+            "percent": 0.5786083335303263
+          },
+          {
+            "name": "ppu_reg_write",
+            "core_cycles": 941497,
+            "percent": 0.5511686527944539
+          },
+          {
+            "name": "apu_run_to",
+            "core_cycles": 918471,
+            "percent": 0.5376888335287047
+          },
+          {
+            "name": "B5_9847",
+            "core_cycles": 895912,
+            "percent": 0.5244824041525196
+          },
+          {
+            "name": "cpu_step",
+            "core_cycles": 874930,
+            "percent": 0.5121991778937708
+          },
+          {
+            "name": "mem_write",
+            "core_cycles": 867368,
+            "percent": 0.5077722521017273
+          },
+          {
+            "name": "F_CEF9",
+            "core_cycles": 866400,
+            "percent": 0.507205568133637
+          },
+          {
+            "name": "ppu_wr",
+            "core_cycles": 827344,
+            "percent": 0.48434150918969965
+          },
+          {
+            "name": "ar_begin_frame",
+            "core_cycles": 817200,
+            "percent": 0.47840303587120053
+          }
+        ],
+        "scope": "CPU-only Musashi attribution, no Amiga bus contention or display DMA; test_hook includes PCM hashing absent from player"
+      },
+      "result": {
+        "native_frames": 2201,
+        "checkpoints": 4,
+        "pcm_fnv32": 2010928262,
+        "core_cycles": 2091516785,
+        "amiga_speed_certified": false,
+        "sprite_cache": {
+          "calls": 172666,
+          "hits": 132243,
+          "misses": 40423,
+          "oam_words": 584383
+        }
+      }
+    },
+    "total_modeled_work_reduction_percent": 3.3615481512853984,
+    "renderer_modeled_work_reduction_percent": 8.029898263360625
+  },
+  "native_full_match": {
+    "native_frames": 100001,
+    "checkpoints": 11,
+    "pcm_fnv32": 959104899,
+    "core_cycles": 78146596292,
+    "amiga_speed_certified": false,
+    "sprite_cache": {
+      "calls": 8071322,
+      "hits": 6546145,
+      "misses": 1525177,
+      "oam_words": 29391708
+    }
+  },
+  "native_pcm": {
+    "native_frames": 6000,
+    "checkpoints": 6,
+    "pcm_fnv32": 1246956292,
+    "core_cycles": 5966287770,
+    "amiga_speed_certified": false,
+    "sprite_cache": {
+      "calls": 532227,
+      "hits": 378258,
+      "misses": 153969,
+      "oam_words": 1646203
+    },
+    "pcm_reference_hash_matched": true
+  },
+  "host_graphics": {
+    "scripts": 9,
+    "source_frames_each": 6000,
+    "compared_pictures_each": 5999,
+    "cached_and_forced_rebuilds": "both passed all scripts",
+    "apu_checks_each": 588,
+    "apu_failures": 0
+  },
+  "ram_baseline": {
+    "scope": "Linked layout checked against ELF; runtime addresses require a separately observed relocated base",
+    "cpu": "stock 68EC020, instruction cache enabled by crt0; no data cache",
+    "linked_base": 2097152,
+    "observed_runtime_base": null,
+    "runtime_fast_bytes": 2819204,
+    "chip_output_bytes": 1109384,
+    "stack_bytes": 16384,
+    "rom_bytes": 262144,
+    "boot_chip_staging_bytes": 654848,
+    "sections": [
+      {
+        "name": ".text",
+        "linked_address": 2097152,
+        "size_bytes": 354240,
+        "memory": "Fast",
+        "stored_in_payload": true,
+        "runtime_address": null
+      },
+      {
+        "name": ".data",
+        "linked_address": 2451392,
+        "size_bytes": 32,
+        "memory": "Fast",
+        "stored_in_payload": true,
+        "runtime_address": null
+      },
+      {
+        "name": ".rom",
+        "linked_address": 2451424,
+        "size_bytes": 262144,
+        "memory": "Fast",
+        "stored_in_payload": true,
+        "runtime_address": null
+      },
+      {
+        "name": ".bss",
+        "linked_address": 2713568,
+        "size_bytes": 2186404,
+        "memory": "Fast",
+        "stored_in_payload": false,
+        "runtime_address": null
+      },
+      {
+        "name": ".stack",
+        "linked_address": 4899972,
+        "size_bytes": 16384,
+        "memory": "Fast",
+        "stored_in_payload": false,
+        "runtime_address": null
+      },
+      {
+        "name": ".chipbuf",
+        "linked_address": 4096,
+        "size_bytes": 1109384,
+        "memory": "Chip",
+        "stored_in_payload": false,
+        "runtime_address": null
+      }
+    ],
+    "objects": [
+      {
+        "name": "hwmem",
+        "linked_address": 25732,
+        "size_bytes": 1036316,
+        "symbol_type": "b",
+        "memory": "Chip"
+      },
+      {
+        "name": "hw_static",
+        "linked_address": 3088056,
+        "size_bytes": 1036312,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "nes",
+        "linked_address": 2769612,
+        "size_bytes": 71934,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "lfsr_seq",
+        "linked_address": 4238338,
+        "size_bytes": 65536,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "lfsr_pos",
+        "linked_address": 4303874,
+        "size_bytes": 65536,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_fix",
+        "linked_address": 4375684,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win6",
+        "linked_address": 4441220,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win5",
+        "linked_address": 4506756,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win4",
+        "linked_address": 4572292,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win3",
+        "linked_address": 4637828,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win2",
+        "linked_address": 4703364,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win1",
+        "linked_address": 4768900,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "tab_win0",
+        "linked_address": 4834436,
+        "size_bytes": 65536,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "bgrow",
+        "linked_address": 2854404,
+        "size_bytes": 65280,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "spr_sh",
+        "linked_address": 3026608,
+        "size_bytes": 61440,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "cfgs",
+        "linked_address": 4124368,
+        "size_bytes": 57920,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "rt_apu",
+        "linked_address": 2715816,
+        "size_bytes": 53480,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "ar_planes",
+        "linked_address": 4182288,
+        "size_bytes": 38400,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "cop",
+        "linked_address": 1062048,
+        "size_bytes": 32768,
+        "symbol_type": "b",
+        "memory": "Chip"
+      },
+      {
+        "name": "spr_sg",
+        "linked_address": 3003568,
+        "size_bytes": 23040,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "cue_noil",
+        "linked_address": 5028,
+        "size_bytes": 20480,
+        "symbol_type": "b",
+        "memory": "Chip"
+      },
+      {
+        "name": "ar_scene",
+        "linked_address": 2947636,
+        "size_bytes": 17304,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "ar_out",
+        "linked_address": 2930812,
+        "size_bytes": 16824,
+        "symbol_type": "B",
+        "memory": "Fast"
+      },
+      {
+        "name": "edge_cache",
+        "linked_address": 4221920,
+        "size_bytes": 16416,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "c2p2",
+        "linked_address": 2965024,
+        "size_bytes": 16384,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "c2p1",
+        "linked_address": 2981408,
+        "size_bytes": 16384,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "plat_buf",
+        "linked_address": 1097984,
+        "size_bytes": 15360,
+        "symbol_type": "B",
+        "memory": "Chip"
+      },
+      {
+        "name": "rsw",
+        "linked_address": 2846242,
+        "size_bytes": 7680,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "ppu_fp_run",
+        "linked_address": 2374060,
+        "size_bytes": 6786,
+        "symbol_type": "T",
+        "memory": "Fast"
+      },
+      {
+        "name": "bgkey",
+        "linked_address": 2919924,
+        "size_bytes": 6720,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "fp_piece",
+        "linked_address": 2363756,
+        "size_bytes": 6452,
+        "symbol_type": "t",
+        "memory": "Fast"
+      },
+      {
+        "name": "cpu_step",
+        "linked_address": 2383212,
+        "size_bytes": 5248,
+        "symbol_type": "T",
+        "memory": "Fast"
+      },
+      {
+        "name": "fp_line",
+        "linked_address": 2359238,
+        "size_bytes": 4518,
+        "symbol_type": "t",
+        "memory": "Fast"
+      },
+      {
+        "name": "bgtab",
+        "linked_address": 2926648,
+        "size_bytes": 4096,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "pcm8_value",
+        "linked_address": 4369411,
+        "size_bytes": 4096,
+        "symbol_type": "b",
+        "memory": "Fast"
+      },
+      {
+        "name": "plat_isr_vbl_c",
+        "linked_address": 2419936,
+        "size_bytes": 274,
+        "symbol_type": "T",
+        "memory": "Fast"
+      },
+      {
+        "name": "plat_isr_audio_c",
+        "linked_address": 2418064,
+        "size_bytes": 228,
+        "symbol_type": "T",
+        "memory": "Fast"
+      },
+      {
+        "name": "plat_isr_ports_c",
+        "linked_address": 2419654,
+        "size_bytes": 178,
+        "symbol_type": "T",
+        "memory": "Fast"
+      },
+      {
+        "name": "plat_isr_ciab_c",
+        "linked_address": 2419832,
+        "size_bytes": 102,
+        "symbol_type": "T",
+        "memory": "Fast"
+      }
+    ],
+    "findings": [
+      "CPU code, ROM, stack, dispatch tables, renderer metadata and interrupt handlers are in Fast RAM",
+      "Displayed bitmaps, Copper lists and Paula sample buffers are in Chip RAM",
+      "The bootloader requests MEMF_FAST dynamically; linked base is not a guaranteed load address",
+      "The boot staging allocation occurs before takeover; it is not added to steady-state buffers as if live simultaneously",
+      "OS/loader coexistence and physical expansion bus width are not measured by this static audit",
+      "Redundant fallback hw_static reserves 1036312 Fast bytes although the player supplies Chip output buffers; candidate removal needs a separate check"
+    ]
+  },
+  "target_renderer_fixture": {
+    "workflow_run": 42409042176,
+    "machine": "stock PAL A1200 68EC020, AGA, 2 MiB Chip + 8 MiB Fast, JIT off, CPU/memory/blitter cycle timing on",
+    "display_dma": true,
+    "paula_dma": true,
+    "full_game_apu_cpu_synthesis": false,
+    "scope": "inclusive renderer elapsed time: snapshot + composition + Copper/publication; excludes source-data generation, vblank pacing waits and diagnostic hashing",
+    "results": [
+      {
+        "variant": "sprite-legacy",
+        "pictures": 64,
+        "renderer_eclock_ticks": 3870726,
+        "max_renderer_eclock_ticks": 80696,
+        "percentile_eclock_ticks": {
+          "p50": 60853,
+          "p95": 77923,
+          "p99": 80696
+        },
+        "planar_sprite_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 6928,
+          "misses": 8432,
+          "oam_words": 43776
+        },
+        "full_game_speed_certified": false,
+        "mean_renderer_ms": 85.25780118949109,
+        "max_renderer_ms": 113.75583432833507,
+        "percentile_ms": {
+          "p50": 85.78348104468839,
+          "p95": 109.84678148070354,
+          "p99": 113.75583432833507
+        }
+      },
+      {
+        "variant": "sprite-compact",
+        "pictures": 64,
+        "renderer_eclock_ticks": 3578464,
+        "max_renderer_eclock_ticks": 76133,
+        "percentile_eclock_ticks": {
+          "p50": 55400,
+          "p95": 73381,
+          "p99": 76133
+        },
+        "planar_sprite_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 6928,
+          "misses": 8432,
+          "oam_words": 43776
+        },
+        "full_game_speed_certified": false,
+        "mean_renderer_ms": 78.82034850199963,
+        "max_renderer_ms": 107.32344769157248,
+        "percentile_ms": {
+          "p50": 78.09647593176567,
+          "p95": 103.44399820124362,
+          "p99": 107.32344769157248
+        }
+      },
+      {
+        "variant": "sprite-rebuild",
+        "pictures": 64,
+        "renderer_eclock_ticks": 3799463,
+        "max_renderer_eclock_ticks": 73537,
+        "percentile_eclock_ticks": {
+          "p50": 53443,
+          "p95": 71091,
+          "p99": 73537
+        },
+        "planar_sprite_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 0,
+          "misses": 15360,
+          "oam_words": 43776
+        },
+        "full_game_speed_certified": false,
+        "mean_renderer_ms": 83.68814043691737,
+        "max_renderer_ms": 103.66390885549191,
+        "percentile_ms": {
+          "p50": 75.33772496789446,
+          "p95": 100.21582257157317,
+          "p99": 103.66390885549191
+        }
+      }
+    ],
+    "legacy_to_compact_work_reduction_percent": 7.550573199963006,
+    "note": "Forced rebuild has lower median/tail times but worse aggregate time than compact caching in this fixture; do not equate hit rate with universal improvement"
+  }
+}

@@ -46,3 +46,17 @@ The public import receives Python syntax checks and local host-only fixture chec
 ## Licenses
 
 Existing file-specific licenses are preserved; no new blanket license is assigned to the whole repository. The original probes/adapters carry 0BSD notices. The pinned Falling source and external fixture are MIT-licensed, Copyright (c) 2018 tragicmuffin, with notices in `experiments/homebrew/LICENSE_FALLING_MIT` and its `references/falling/LICENSE`. They come from [xram64/falling-nes](https://github.com/xram64/falling-nes/tree/52dcb8a951200562e696dfc2aba5d4d14edd0078). No NES ROM, CHR binary or proprietary firmware is bundled. The optional homebrew tests require separately supplied local fixture files. Mesen's GPL-3.0 notice is retained; its executable is downloaded separately from its pinned official release. References with unclear redistribution rights are not bundled.
+
+
+## Little League Baseball batting prototype
+
+The earlier [batting experiment](experiments/little-league/README.md) is retained as a standalone native prototype. The full cartridge-engine port below is now the main development path.
+
+## Little League Baseball original engine
+
+The [full-game port](ports/little-league/README.md) now uses the original cartridge program through the existing static translator, PPU/MMC1 runtime, planar renderer and APU mixer. It builds a private bootable ADF. The earlier batting prototype is retained as an experiment. Full-speed 1:1 acceptance on the declared A1200 remains open.
+
+
+## Headless cloud tests
+
+[Headless execution](environment/HEADLESS.md) installs and runs Mesen and FS-UAE on a bounded GitHub-hosted Linux runner. Public runs use original fixtures and test firmware. Full-game private inputs remain separate.
