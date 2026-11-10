@@ -166,15 +166,15 @@ rt_wr:
 	move.b d6,rt+194           /* open bus */
 	rts
 1:	cmp.w #0x8000,d7
-	bcs.s rt_wr_gen
+	bcs.s .Lrt_wr_gen_local
 rt_wr_mmc1:
 .ifdef XRT_CHECK
 	bra rt_wr_gen              /* host self-check (PPU_CHECK) mirrors mapper writes to the reference instance in C */
 .endif
 	tst.b d6
-	bmi.s rt_wr_gen            /* bit 7: reset of the shift register */
+	bmi.s .Lrt_wr_gen_local            /* bit 7: reset of the shift register */
 	cmp.b #4,nes+9
-	beq.s rt_wr_gen            /* the fifth write loads a register: banks, mirroring, PPU synchronisation */
+	beq.s .Lrt_wr_gen_local            /* the fifth write loads a register: banks, mirroring, PPU synchronisation */
 	TRACE_CALL 87
 	addq.b #1,nes+9
 	and.b #1,d6
@@ -186,6 +186,8 @@ rt_wr_mmc1:
 	rts
     .globl rt_wr_gen
 rt_wr_gen:
+/* Keep short branches local: exported forward symbols need relocations on GNU as. */
+.Lrt_wr_gen_local:
 	movem.l d0-d1/a0-a1,-(sp)
 	moveq #0,d0
 	move.w d7,d0

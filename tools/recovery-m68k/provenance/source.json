@@ -1,0 +1,11 @@
+{
+  "repository": "https://deb.debian.org/debian/",
+  "distribution": "trixie",
+  "architecture": "amd64",
+  "release_sha256": "0584fba32e13e0ab8285fb16c27adea1ec03a73669c18702821094fd6ca86675",
+  "packages_xz_sha256": "7778d3e3f303b7ddb8ce0fe7c8d57473a076c6bf2e8f241f75421d2396352498",
+  "host_keyring": "/usr/share/keyrings/debian-archive-keyring.gpg",
+  "host_keyring_sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017",
+  "verification": "gpg verified InRelease using the preinstalled Debian archive keyring; InRelease SHA256 verifies Packages.xz; package SHA256 verifies each .deb; no package maintainer scripts executed.",
+  "host_runtime_dependency": "Debian 13 amd64 native runtime shared libraries remain supplied by the host. This is a private cross toolchain, not a chroot or replacement host runtime."
+}

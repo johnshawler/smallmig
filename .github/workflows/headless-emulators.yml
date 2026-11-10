@@ -1,7 +1,7 @@
 name: Headless emulators
 on:
   push:
-    branches: [little-league-playable]
+    branches: [little-league-playable, recovery/nov10-rebuild-baseline]
     paths:
       - '.github/workflows/headless-emulators.yml'
       - 'environment/headless-*'
@@ -12,6 +12,8 @@ on:
       - 'ports/little-league/vendor/platform-a1200/ar_sprite_test.c'
       - 'ports/little-league/vendor/runtime/arender.*'
       - 'ports/little-league/vendor/tests/**'
+      - 'ports/little-league/tests/**'
+      - 'ports/little-league/vendor/runtime/rt_x.s'
       - 'ports/little-league/vendor/translator/**'
   workflow_dispatch:
 permissions:
@@ -53,3 +55,5 @@ jobs:
       - name: Compare native registers, flags, memory and exact I/O cycles
         working-directory: ports/little-league/vendor
         run: XL_DIRECT_FIXED_IO=1 make -C tests/xlunit TRIALS=32 QEMUFLAGS='-cpu m68020 -one-insn-per-tb'
+      - name: Check runtime short-branch encodings
+        run: python3 ports/little-league/tests/check_rt_x_branches.py

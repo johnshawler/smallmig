@@ -1,0 +1,7 @@
+/root/
+/downloads/
+/gnupg/
+/smoke/
+/provenance/Packages.xz
+/provenance/*-verification.txt
+/provenance/*.log

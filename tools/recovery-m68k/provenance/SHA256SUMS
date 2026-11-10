@@ -1,0 +1,16 @@
+10b2692271c3109f2ef86dc9698aa61f86604378d5777682b09f552562e794fe  downloads/gcc-m68k-linux-gnu_14.2.0-1_amd64.deb
+e913073e656afe505201a95f828b30652df924936e9b2e5b3af9ac76df27f71e  downloads/cpp-m68k-linux-gnu_14.2.0-1_amd64.deb
+c0c76f2f8ddc5e1fd041399c5064098aa8e2f81ab9da4c557f8431a8fd011e18  downloads/gcc-14-m68k-linux-gnu_14.2.0-19cross1_amd64.deb
+8f9e026b306113cf974186c58884073d3e9e0ef9016e1a35e239cecdfd0eaf01  downloads/gcc-14-m68k-linux-gnu-base_14.2.0-19cross1_amd64.deb
+06c1c0943ddedd6b533220f3d98b62811d32129cf61c7aa680d3a2c2b028e1e3  downloads/cpp-14-m68k-linux-gnu_14.2.0-19cross1_amd64.deb
+3444fa7c3e93819c4b1661b9caa79e7f97be50ec93b2e4b8a466e312d5c8ade1  downloads/gcc-14-cross-base-ports_14.2.0-19cross1_all.deb
+f0bd30e0fb53939b02310fbce4876e0c505bfa27e0cae0ee0e23b8fd5148a785  downloads/libgcc-14-dev-m68k-cross_14.2.0-19cross1_all.deb
+c60f67f1b2f91e5815bee7285e92c6011804413d357f28279ce010919038ecf9  downloads/libgcc-s2-m68k-cross_14.2.0-19cross1_all.deb
+5bdd8bb1b50e68fac5e4a842d51c6a451b770b8deb491f8c06a1ed85b422e9b9  downloads/libgomp1-m68k-cross_14.2.0-19cross1_all.deb
+f53dfdc69dd9c5263920ec1a37fe186ced083d0e8196ec64b4640d4e8a980b97  downloads/libatomic1-m68k-cross_14.2.0-19cross1_all.deb
+195f98f2c4fa751481d6c10eab3b1d8995a67d6452ab5de99fc15686550dc552  downloads/binutils-m68k-linux-gnu_2.44-3_amd64.deb
+002da5d23f8757dee97a2c0a40e0e1d4d85a43da094488ee2ee7068d4d3691f9  downloads/binutils-common_2.44-3_amd64.deb
+5358492b57e06b4f4c3be53ee3cc7eee38995fde234a9f5b8b598a0ef60952d4  downloads/libc6-dev-m68k-cross_2.41-11cross1_all.deb
+6e669a6833283e38ab43814aaf41284ab802e378cd5c42d02e8d1ae4defa754a  downloads/libc6-m68k-cross_2.41-11cross1_all.deb
+1b78b55145aea3880e99a2ee554d6ec451bc89302cf6f643db938d9e5cf9766c  downloads/linux-libc-dev-m68k-cross_6.12.38-1cross1_all.deb
+ca6ede739327a20ae5a3498230c8a3a9a072c586e131bc6bcc1201eb1725e336  downloads/qemu-user_10.0.13+ds-0+deb13u1_amd64.deb

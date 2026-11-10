@@ -64,3 +64,7 @@ without clearing or checking unused slots. It retains the original key path and
 supports forced rebuild checks. It remains opt-in pending complete player timing.
 Each build exports `memory-map.json` and `memory-map.md`; their addresses are
 linked addresses unless a running relocated base was supplied to `memory_map.py`.
+
+## November 10 source recovery
+
+See [recovery results](RECOVERY-2026-11-10.md) for the reproducible older-source build, assembler compatibility fix, fresh bounded tests and remaining limits. This does not restore later workspace-only native conversions.
