@@ -148,7 +148,12 @@ def build_blocks(prog):
 def label(key): c,a=key; return ('F_%04X'%a) if c==7 else ('B%d_%04X'%(c,a))
 
 def liveness(prog,blocks):
-    live_in={k:0 for k in blocks}
+    # Every generated block begins with a budget guard that can enter rt_slow
+    # BEFORE its first 6502 instruction. The runtime reconstructs P there and
+    # may push it for an interrupt, even when that instruction kills a flag.
+    # Keep entry liveness (also used by Gen's branch-chain queries) distinct
+    # from instruction liveness, so dead flags within a block still optimize.
+    live_in={k:ALL for k in blocks}
     def target_live(key):
         return live_in[key] if key in live_in else ALL      # not a translated leader: interpreter, assume everything live
     changed=True; it=0
@@ -169,6 +174,7 @@ def liveness(prog,blocks):
                 i.live=live            # live AFTER this instruction (for branches: union with taken target)
                 live=(live&~d)|u
                 if i.m=='JSR' : live=live  # calls: callee flags (conservative: all live into callee if unknown)
+            live |= ALL       # implicit rt_slow successor at block entry
             if live!=live_in[k]: live_in[k]=live; changed=True
     return live_in
 
