@@ -230,10 +230,12 @@
     "original_rom_bytes_exact": true,
     "source_frames_done": 1107,
     "ppu_frame": 1108,
-    "game_ram_sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+    "game_ram_sha256": "253a1d83e8dfab04184a02bbaa6efdbc75b4119ef0dcf932b2113ea7e73a431e",
     "frame_equals_pre_fix_capture": true,
     "chip_ram_equals_pre_fix_capture": true,
-    "scope": "Observed recovered original-engine execution in PAL68020/2MiB Chip/8MiB Fast. Boot includes startup and is not a steady gameplay speed measurement. Frontend metadata ownership fix only."
+    "scope": "Observed recovered original-engine execution in PAL68020/2MiB Chip/8MiB Fast. Boot includes startup and is not a steady gameplay speed measurement. Frontend metadata ownership fix only.",
+    "game_ram_offset": 69878,
+    "layout_correction": "2026-11-11: recomputed with AMIGA player layout; former hash used host-only line-palette fields. Frame counters, artifact hashes and boot result unchanged."
   },
   "limitations": [
     "No zero-Fast stock qualification for this recovered branch.",
