@@ -19,7 +19,32 @@
       "source_frames_per_second": 25.566666666666666,
       "fraction_of_ntsc_game_rate": 0.42541060165372135
     },
-    "scope": "Two deterministic same-config no-input coldboots compared at9000/15000fields. Expanded2MiBFast emulation, not stock/physical/fullgame benchmark."
+    "scope": "Two deterministic same-config no-input coldboots compared at9000/15000fields. Expanded2MiBFast emulation, not stock/physical/fullgame benchmark.",
+    "presentation_audio": {
+      "start": {
+        "st_dconv": 1172,
+        "st_dskip": 3516,
+        "st_late": 4688,
+        "audio_chunks_played": 4688,
+        "audio_underruns": 61056
+      },
+      "end": {
+        "st_dconv": 1939,
+        "st_dskip": 5817,
+        "st_late": 7756,
+        "audio_chunks_played": 7756,
+        "audio_underruns": 122860
+      },
+      "delta": {
+        "st_dconv": 767,
+        "st_dskip": 2301,
+        "st_late": 3068,
+        "audio_chunks_played": 3068,
+        "audio_underruns": 61804
+      },
+      "accepted_display_submissions_per_second": 6.391666666666667,
+      "scope": "st_dconv counts accepted display submissions, not PAL refreshes. audio_underruns counts scheduling a32-sample silence block because the ring is empty, not seconds or distinct audible gaps."
+    }
   },
   "compact": {
     "physical_fields": 15000,
@@ -41,7 +66,32 @@
       "source_frames_per_second": 25.791666666666668,
       "fraction_of_ntsc_game_rate": 0.42915443680517196
     },
-    "scope": "Two deterministic same-config no-input coldboots compared at9000/15000fields. Expanded2MiBFast emulation, not stock/physical/fullgame benchmark."
+    "scope": "Two deterministic same-config no-input coldboots compared at9000/15000fields. Expanded2MiBFast emulation, not stock/physical/fullgame benchmark.",
+    "presentation_audio": {
+      "start": {
+        "st_dconv": 1181,
+        "st_dskip": 3541,
+        "st_late": 4722,
+        "audio_chunks_played": 4721,
+        "audio_underruns": 60557
+      },
+      "end": {
+        "st_dconv": 1955,
+        "st_dskip": 5862,
+        "st_late": 7817,
+        "audio_chunks_played": 7816,
+        "audio_underruns": 121957
+      },
+      "delta": {
+        "st_dconv": 774,
+        "st_dskip": 2321,
+        "st_late": 3095,
+        "audio_chunks_played": 3095,
+        "audio_underruns": 61400
+      },
+      "accepted_display_submissions_per_second": 6.45,
+      "scope": "st_dconv counts accepted display submissions, not PAL refreshes. audio_underruns counts scheduling a32-sample silence block because the ring is empty, not seconds or distinct audible gaps."
+    }
   },
   "compact_throughput_gain_percent": 0.8800521512385862,
   "configuration": {
@@ -53,7 +103,8 @@
     "core_commit": "d366f77c60e5a5f059f129cc3773d3048306083b",
     "frontend_sha256": "755220f09f03b009a8cef7a19a1003289b995ed85fe20470b96eceb6fff5127d",
     "input": "none",
-    "source_game_hz": 60.0988
+    "source_game_hz": 60.0988,
+    "display_skip_max": 3
   },
   "adf_sha256": {
     "legacy": "2fc8eb702cc6a4dd10fd271c90bf0439c9f5e9aaa394f0710471f1a96a10368b",
@@ -63,6 +114,7 @@
     "Endpoints come from separate deterministic same-config coldboots, not a single run with continuous in-flight counter sampling.",
     "This is one no-input interval in expanded-memory emulation, not a physical machine/fullmatch or interactive latency benchmark.",
     "Different variants reach different source-game phases by each endpoint; CPU-only and synthetic-renderer percentages must not be substituted for this throughput.",
-    "No zero-Fast stock or full-speed acceptance."
+    "No zero-Fast stock or full-speed acceptance.",
+    "The player skips up to three consecutive picture conversions when late. Source updates are not displayed frames; native PCM hash equality is not real-time audio playback acceptance."
   ]
 }

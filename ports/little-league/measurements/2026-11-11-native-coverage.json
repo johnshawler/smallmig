@@ -1,0 +1,224 @@
+{
+  "date": "2026-11-11",
+  "experiment": "Expand corrected compact native oracle coverage to cov1\u20138",
+  "status": "passed",
+  "source_test_baseline_commit": "2913103db804a1197585c0d4d0f2b3923d26aa6b",
+  "runtime_source_baseline_commit": "c61239ba5d6aa18122173e91ae8fa6c87ea5131e",
+  "runner": "ports/little-league/tests/check_native_script_matrix.py",
+  "runner_sha256": "5787aeb2b6aa6332f8f0ab0850f99fe2572b3b22ade2dbbe57f13b5777e17fab",
+  "core": "Musashi",
+  "core_commit": "313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd",
+  "payload": "Existing corrected compact, exact audio, external renderer storage, default 16-bit fetch; no rebuild or runtime edits",
+  "payload_sha256": {
+    "elf": "ad00a2b4fce728386d2321b1dbeb11cf8177ffb23ca08f5693300b10feb2a984",
+    "bin": "2c2ef4fb370a57306603859161409f010b8eae5c710504eed0ad69ab96577fdf"
+  },
+  "source_payloads_unchanged": true,
+  "copied_payloads_unchanged": true,
+  "reference": "Verified legacy/compact/forced-rebuild guarded host matrix, with matching state/PCM streams per script",
+  "host_report_sha256": "57b173875b2774e215f8fd3ae9a32db729062ce5e4923f6148db3482b54c66e1",
+  "workers": 2,
+  "new_native_frames": 48000,
+  "new_native_checkpoints": 48000,
+  "new_scripts": [
+    {
+      "script": "cov1",
+      "input_sha256": "4b7a8e88e0cf00572d80dc6adaea0e76a68f93c793a74548e3f2d1eb17ca0b0d",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "5551508961ca14391afecb4fd7cf62f1857ba4add3e815e595c831a3095c6b2d",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "441bbd7d07085eee1d5fc85b2cd9a48e82684a52825cd61df524bed6b9183826",
+      "native_pcm_fnv32": 4049149391,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 3750602378,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov1-6000"
+    },
+    {
+      "script": "cov2",
+      "input_sha256": "241b53f3d50dbc85d179d3d9bc7002b834eaa4a95f39fb88b929208114e9f453",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "32b9d387d06f806bb58c24f8c03d337bf730fb17c3a1aaa6b9c8e445524b3299",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "1e9822b167e5deded4d1bad04cc5ec2433c44eb38b546ffa662a893031419498",
+      "native_pcm_fnv32": 2052053047,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 4421929946,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov2-6000"
+    },
+    {
+      "script": "cov3",
+      "input_sha256": "45f851e063e87ab56bb90d57e25f85b0d7e020912969d34d15e8756c23b8545e",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "eec1ac8044de2e264f21880772343a3582c57e6ba2477745518d317df3e2179a",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "2274b71d0645fc621ca14f6c5ec92d10aba85f4da3db2ec428af483276162d76",
+      "native_pcm_fnv32": 599474814,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 3127831982,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov3-6000"
+    },
+    {
+      "script": "cov4",
+      "input_sha256": "bb58f0f497ed324056f5e7d0a221b4aee283908cce842346b8909044e5ccd443",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "dd2286fc90b25aa22022a2bd580cd3a1fca4ae7215a3be68606a1324bb490a3a",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "f4a1d767e08548740288ff225a962107692733e2232a827781b6e09c0c0678cf",
+      "native_pcm_fnv32": 113467087,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 4956568667,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov4-6000"
+    },
+    {
+      "script": "cov5",
+      "input_sha256": "c5ebe429209cfcb0e4cccb567633b20528c7ba7005ab12877b0094ea3ac146c2",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "2132400c558488faa315cb66a20ab54b12085d920a49504bee05a56330c993de",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "001e001c0cbaa94ef330b830a1c582962af9e0474862cea857265c6066d5c24b",
+      "native_pcm_fnv32": 3204193097,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 4235846088,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov5-6000"
+    },
+    {
+      "script": "cov6",
+      "input_sha256": "fa531dea29e0c60933422e9b4e640c3af9a2cede1e37056308e35520ff044d55",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "2d82bef118241d083b88d54d13dff283b84979ddefd357985c5aed06c5c76305",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "ee64aca3b101f0ddc2406aa31e8c85f6c672bdad723ff736ad8ecc044a686b0f",
+      "native_pcm_fnv32": 54352628,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 4837055494,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov6-6000"
+    },
+    {
+      "script": "cov7",
+      "input_sha256": "7b0f4992fd12fb32664069a68bf7a08fab8fe718418dab8d0391e492b64db2bc",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "de448c5ee637bf49db2b1b1beddc58b0f2537b41affd40dce70eaa004244e6f3",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "54d253f479322d938ccfd6d06246ca69a14a0901f38dac3a0e4a74c421f452e0",
+      "native_pcm_fnv32": 275898297,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 3200572124,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov7-6000"
+    },
+    {
+      "script": "cov8",
+      "input_sha256": "9ce2be8d165456943cf40566f1ed945d9efcbd92200628033fd3ceb1c75d01ee",
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "state_mismatches": 0,
+      "native_state_sha256": "8c83c507050ce813c978ba9fd81ba4e8081648123b4f55a7e3bd04f02b03c109",
+      "state_equals_reference_bytes": true,
+      "reference_pcm_sha256": "b6a77fc6b9d88f85a8d49ba4f7c626dbec4ce6acb094f1d0c58f013ea52d6d11",
+      "native_pcm_fnv32": 2220548976,
+      "pcm_reference_hash_matched": true,
+      "cpu_only_core_cycles": 2761114648,
+      "private_native_output": "build/little-league-original/native-check/run-20261111T003550Z-__0eishr-cov8-6000"
+    }
+  ],
+  "prior_watchgame": {
+    "frames": 6000,
+    "checkpoints": 6000,
+    "state_mismatches": 0,
+    "native_state_sha256": "40dace7509e495aaaad197c9a054444cf441793dcddf46c3f16bde35ad5b23f9",
+    "native_pcm_fnv32": 1246956292,
+    "pcm_reference_hash_matched": true,
+    "measurement": "2026-11-11-corrected-rowkey.json"
+  },
+  "combined_qualification": {
+    "scripts": 9,
+    "frames_per_script": 6000,
+    "native_checkpoints": 54000,
+    "state_mismatches": 0,
+    "all_pcm_reference_hashes_matched": true
+  },
+  "preflight_rejection_tests": [
+    {
+      "case": "failed host matrix",
+      "rejected": true,
+      "message": "Need a passed host matrix",
+      "native_runs_started": 0
+    },
+    {
+      "case": "different host frame count",
+      "rejected": true,
+      "message": "Need a passed host matrix",
+      "native_runs_started": 0
+    },
+    {
+      "case": "unsupported fetch layout",
+      "rejected": true,
+      "message": "16-bit compact payload only",
+      "native_runs_started": 0
+    },
+    {
+      "case": "missing host variant",
+      "rejected": true,
+      "message": "host matrix lacks the three variants",
+      "native_runs_started": 0
+    },
+    {
+      "case": "changed state stream",
+      "rejected": true,
+      "message": "host state hash changed",
+      "native_runs_started": 0
+    },
+    {
+      "case": "changed PCM stream",
+      "rejected": true,
+      "message": "host PCM hash changed",
+      "native_runs_started": 0
+    },
+    {
+      "case": "changed controller script",
+      "rejected": true,
+      "message": "controller script changed",
+      "native_runs_started": 0
+    },
+    {
+      "case": "duplicate scripts",
+      "rejected": true,
+      "message": "Invalid frames or duplicate scripts",
+      "native_runs_started": 0
+    },
+    {
+      "case": "too few frames",
+      "rejected": true,
+      "message": "Invalid frames or duplicate scripts",
+      "native_runs_started": 0
+    }
+  ],
+  "preservation": "Each script uses a fresh uniquely named ELF/bin copy, so native_check output naming cannot collide with another script or prior run. Original/copy SHA-256 identities verified. Earlier artifacts retained.",
+  "limits": [
+    "Functional native 68020 execution with RAM/OAM/palette/nametable checkpoints and whole-stream PCM FNV32 comparison. No native framebuffer comparison in this runner.",
+    "CPU-only core cycles are not Amiga wall-clock, DMA/bus-contention or physical-hardware measurements.",
+    "Passing nine scripted scenarios does not prove all game paths, all gameplay states or removal of interpreter fallbacks.",
+    "No renderer, translator, runtime, default-mode or published binary change in this checkpoint."
+  ],
+  "reproduction": "python3 ports/little-league/tests/check_native_script_matrix.py --payload ports/little-league/vendor/build/smallmig-exact-interrupt-flags-rowkey/llb.elf --host-report build/little-league-corrected-rowkey/host-tests/run-20261111T002220Z-zibbkywc/result.json --musashi /path/to/pinned/Musashi --frames 6000 --workers 2",
+  "private_report": "build/little-league-native-script-matrix/run-20261111T003550Z-__0eishr/result.json",
+  "private_report_sha256": "280b416f81bc9ad7242f1fd890bb9a0752132ae283a222d6e12940ca5aff137b",
+  "private_progress_log": "recovery-results/native-script-matrix/run.log",
+  "source_test_baseline_commit_public_equivalent": "4f4d70f58476f051a2f467596389324673c0da3e",
+  "source_test_baseline_commit_tree_sha": "49d3351e8e2bdfce602c75765cbd74e44b7726cc",
+  "runtime_source_baseline_commit_public_equivalent": "da8b046f5ddc11466a8fc852ac6d4405527ecf79",
+  "runtime_source_baseline_commit_tree_sha": "fbf31fd059a7119cfab786855a0356d8f5001221"
+}
