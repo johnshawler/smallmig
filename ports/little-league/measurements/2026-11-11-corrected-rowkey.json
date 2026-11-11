@@ -1,0 +1,542 @@
+{
+  "date": "2026-11-11",
+  "experiment": "Existing compact row key on corrected interrupt-boundary baseline",
+  "decision": "Qualified opt-in candidate; renderer implementation and default build options remain unchanged.",
+  "source_base_commit": "c61239ba5d6aa18122173e91ae8fa6c87ea5131e",
+  "source_sha256": {
+    "ports/little-league/vendor/runtime/arender.c": "f06699af94a8a11de590a3d1c83680e2546b559256f2af280c997556f596f555",
+    "ports/little-league/vendor/translator/x65.py": "3a8ca07c3a33ed9698ba02279c5a8f29e10a2c33f742920fe1ffb2c4751b3c3f",
+    "ports/little-league/tests/check_rowkey_storage.py": "f6dd85f197f6c711c691f22ec46b902e8c19c75958b43f1d13cb3e71fd8fd526",
+    "ports/little-league/tests/check_puae_sprite_capture.py": "8880c45fe199b6ba281cf9f45284c1c2d6a79e157da3857668969d0e46af9188"
+  },
+  "build": {
+    "common_environment": {
+      "PREFIX": "m68k-linux-gnu-",
+      "EXTRA": "-DAUDIO_EXACT -DAR_NO_STATIC",
+      "FASTRAM": "1",
+      "FAST_BASE": "0x200000",
+      "ARENDER_HW": "2",
+      "RELOCATE": "1",
+      "CACHE030": "0",
+      "CACHE040": "0",
+      "CACHE060": "0"
+    },
+    "extra_defines": {
+      "legacy": [],
+      "compact": [
+        "AR_COMPACT_ROWKEY"
+      ],
+      "forcedrebuild": [
+        "AR_COMPACT_ROWKEY",
+        "AR_NOROWCACHE"
+      ]
+    },
+    "fetch_bits": 16,
+    "exact_pcm": true,
+    "native_game_cache_counters_instrumented": false,
+    "adf_sha256": {
+      "legacy": "2fc8eb702cc6a4dd10fd271c90bf0439c9f5e9aaa394f0710471f1a96a10368b",
+      "compact": "98e0bdeca350650f01971a87bd723acd88135a037699ed1b69cc16235e42a19f",
+      "forcedrebuild": "29182deb5b709d4a20b92230534841c380176c6d464deea8aec2f97b6ab437cf"
+    },
+    "cartridge_derived_binaries_published": false
+  },
+  "native_validation": {
+    "core": "Musashi",
+    "core_commit": "313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd",
+    "compact_short": {
+      "native_frames": 1222,
+      "checkpoints": 1222,
+      "pcm_fnv32": 141209669,
+      "core_cycles": 1069411466,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 0
+    },
+    "legacy_full": {
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "pcm_fnv32": 1246956292,
+      "core_cycles": 5693077302,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 0
+    },
+    "compact_full": {
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "pcm_fnv32": 1246956292,
+      "core_cycles": 5481758829,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 0
+    },
+    "full_native_states_equal_host_and_corrected_legacy": true,
+    "state_bytes": 26352000,
+    "state_sha256": "40dace7509e495aaaad197c9a054444cf441793dcddf46c3f16bde35ad5b23f9",
+    "full_pcm_equals_host": true,
+    "pcm_sha256": "0047a26726da6f154ebe1883cb98587fb7b1f85cc38eb2159451ec409721b0fe",
+    "regression_unit_tests_passed": 11,
+    "scope": "Actual translated 68020 execution; states cover RAM/OAM/palette/nametables. Native game check is not a framebuffer comparison or real-Amiga speed proof."
+  },
+  "cpu_only_profiles": {
+    "legacy": {
+      "frame_window": [
+        1600,
+        2200
+      ],
+      "core_cycles": 532385498,
+      "renderer_cycles": 199885713,
+      "hw_line_cycles": 105754621,
+      "profile_sha256": "ea405f9be35ff107c6c810cd578fa291761175c7faf2e8cb33ae62daa096acb1",
+      "state_checkpoints": 2200,
+      "state_mismatches": 0
+    },
+    "compact": {
+      "frame_window": [
+        1600,
+        2200
+      ],
+      "core_cycles": 511523898,
+      "renderer_cycles": 179024113,
+      "hw_line_cycles": 84893021,
+      "profile_sha256": "9f13f1e2a250de82024701a7c353bfe6b5a2aa6d0672b110bd56cc62c4c98b91",
+      "state_checkpoints": 2200,
+      "state_mismatches": 0
+    },
+    "forcedrebuild": {
+      "frame_window": [
+        1600,
+        2200
+      ],
+      "core_cycles": 602666362,
+      "renderer_cycles": 270166577,
+      "hw_line_cycles": 176035485,
+      "profile_sha256": "48722eb298d5e6e59094bf174ffd091776b5d7b144836fd0cf979d6bf5e463fb",
+      "state_checkpoints": 2200,
+      "state_mismatches": 0
+    }
+  },
+  "cpu_only_comparison": {
+    "window_total_reduction_percent": 3.91851394870264,
+    "window_renderer_reduction_percent": 10.43676393219759,
+    "full_6000_total_reduction_percent": 3.7118497043025056,
+    "scope": "Same source-frame window and build options, differing only in row-cache options. All other category absolute cycle totals match. Includes test-hook PCM hashing absent from the player; excludes real Chip bus and display DMA contention."
+  },
+  "guarded_host_matrix": {
+    "status": "passed",
+    "test": "ports/little-league/tests/check_rowkey_storage.py",
+    "common_flags": [
+      "-O2",
+      "-DPPU_FB5",
+      "-DRT_AUDIO=1",
+      "-DAR_NO_STATIC"
+    ],
+    "additional_flags": {
+      "legacy": [],
+      "compact": [
+        "-DAR_COMPACT_ROWKEY"
+      ],
+      "forcedrebuild": [
+        "-DAR_COMPACT_ROWKEY",
+        "-DAR_NOROWCACHE"
+      ]
+    },
+    "fetch_bits": 16,
+    "runs": 27,
+    "frames_per_run": 6000,
+    "total_frames": 162000,
+    "total_per_dot_ppu_comparisons": 223802013,
+    "total_planar_frames": 161973,
+    "per_variant_ppu_counts": {
+      "play_watchgame": 9836930,
+      "cov1": 6585815,
+      "cov2": 9841802,
+      "cov3": 4471556,
+      "cov4": 13351580,
+      "cov5": 9648367,
+      "cov6": 12939480,
+      "cov7": 4671017,
+      "cov8": 3254124
+    },
+    "state_and_pcm_hashes_match_across_all_three_variants_for_each_script": true,
+    "state_bytes_per_run": 26352000,
+    "state_records_per_run": 6000,
+    "state_record_bytes": 4392,
+    "pcm_bytes_per_run": 2867696,
+    "pcm_records_per_run": 6000,
+    "pcm_samples_per_run": 2855696,
+    "both_layers_and_storage_guards_passed_all_runs": true,
+    "negative_validator_tests_passed": [
+      "missing guard marker",
+      "missing PPU marker",
+      "missing planar marker",
+      "missing completion marker",
+      "truncated state",
+      "truncated PCM",
+      "wrong state index",
+      "wrong PAL PCM cadence",
+      "trailing PCM data"
+    ],
+    "caveats": [
+      "The first host startup frame has no renderer scene. Exactly 5999 planar frames are required per 6000-frame run; all 6000 state and PCM records are checked.",
+      "This tests the host C runtime with default 16-bit fetch, not the translated m68k interrupt handlers or physical Amiga display/audio hardware.",
+      "The existing external-storage runner's guarded allocation includes its intentional four-byte DMA pad. Both selected layer sets are observed.",
+      "An initial two-frame smoke run correctly failed the originally over-strict planar count; its output is preserved. After correcting startup accounting, all 27 two-frame smoke runs and all full runs passed."
+    ]
+  },
+  "host_script_hashes": {
+    "play_watchgame": {
+      "input_sha256": "d56dbffdf0a213720e5ef237bc5faf2762fd97bf57163f44f59eda4d32b4597b",
+      "streams": {
+        "state": {
+          "sha256": "40dace7509e495aaaad197c9a054444cf441793dcddf46c3f16bde35ad5b23f9",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "0047a26726da6f154ebe1883cb98587fb7b1f85cc38eb2159451ec409721b0fe",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov1": {
+      "input_sha256": "4b7a8e88e0cf00572d80dc6adaea0e76a68f93c793a74548e3f2d1eb17ca0b0d",
+      "streams": {
+        "state": {
+          "sha256": "5551508961ca14391afecb4fd7cf62f1857ba4add3e815e595c831a3095c6b2d",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "441bbd7d07085eee1d5fc85b2cd9a48e82684a52825cd61df524bed6b9183826",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov2": {
+      "input_sha256": "241b53f3d50dbc85d179d3d9bc7002b834eaa4a95f39fb88b929208114e9f453",
+      "streams": {
+        "state": {
+          "sha256": "32b9d387d06f806bb58c24f8c03d337bf730fb17c3a1aaa6b9c8e445524b3299",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "1e9822b167e5deded4d1bad04cc5ec2433c44eb38b546ffa662a893031419498",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov3": {
+      "input_sha256": "45f851e063e87ab56bb90d57e25f85b0d7e020912969d34d15e8756c23b8545e",
+      "streams": {
+        "state": {
+          "sha256": "eec1ac8044de2e264f21880772343a3582c57e6ba2477745518d317df3e2179a",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "2274b71d0645fc621ca14f6c5ec92d10aba85f4da3db2ec428af483276162d76",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov4": {
+      "input_sha256": "bb58f0f497ed324056f5e7d0a221b4aee283908cce842346b8909044e5ccd443",
+      "streams": {
+        "state": {
+          "sha256": "dd2286fc90b25aa22022a2bd580cd3a1fca4ae7215a3be68606a1324bb490a3a",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "f4a1d767e08548740288ff225a962107692733e2232a827781b6e09c0c0678cf",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov5": {
+      "input_sha256": "c5ebe429209cfcb0e4cccb567633b20528c7ba7005ab12877b0094ea3ac146c2",
+      "streams": {
+        "state": {
+          "sha256": "2132400c558488faa315cb66a20ab54b12085d920a49504bee05a56330c993de",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "001e001c0cbaa94ef330b830a1c582962af9e0474862cea857265c6066d5c24b",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov6": {
+      "input_sha256": "fa531dea29e0c60933422e9b4e640c3af9a2cede1e37056308e35520ff044d55",
+      "streams": {
+        "state": {
+          "sha256": "2d82bef118241d083b88d54d13dff283b84979ddefd357985c5aed06c5c76305",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "ee64aca3b101f0ddc2406aa31e8c85f6c672bdad723ff736ad8ecc044a686b0f",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov7": {
+      "input_sha256": "7b0f4992fd12fb32664069a68bf7a08fab8fe718418dab8d0391e492b64db2bc",
+      "streams": {
+        "state": {
+          "sha256": "de448c5ee637bf49db2b1b1beddc58b0f2537b41affd40dce70eaa004244e6f3",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "54d253f479322d938ccfd6d06246ca69a14a0901f38dac3a0e4a74c421f452e0",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    },
+    "cov8": {
+      "input_sha256": "9ce2be8d165456943cf40566f1ed945d9efcbd92200628033fd3ceb1c75d01ee",
+      "streams": {
+        "state": {
+          "sha256": "8c83c507050ce813c978ba9fd81ba4e8081648123b4f55a7e3bd04f02b03c109",
+          "bytes": 26352000,
+          "records": 6000,
+          "record_bytes": 4392
+        },
+        "pcm": {
+          "sha256": "b6a77fc6b9d88f85a8d49ba4f7c626dbec4ce6acb094f1d0c58f013ea52d6d11",
+          "bytes": 2867696,
+          "records": 6000,
+          "samples": 2855696,
+          "format": "u16be word count + signed 8-bit samples"
+        }
+      }
+    }
+  },
+  "target_renderer_fixture": {
+    "core": "PUAE 5.3.1 d366f77",
+    "configuration": "PAL A1200, 68020 cycle-exact settings, 2 MiB Chip + 8 MiB Fast, 16-bit fetch",
+    "timed_pictures_per_variant": 64,
+    "prewarm_pictures": 32,
+    "bounded_physical_fields": 1000,
+    "active_display_and_paula_dma": true,
+    "variants": {
+      "legacy": {
+        "renderer_eclock_ticks": 3357599,
+        "max_renderer_eclock_ticks": 69341,
+        "observed_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 6928,
+          "misses": 8432,
+          "oam_words": 43776
+        },
+        "percentiles": {
+          "p50": 50054,
+          "p95": 67013,
+          "p99": 69341
+        },
+        "variant": "legacy",
+        "pictures": 64,
+        "expected_fnv32": 4042647880,
+        "crop": [
+          104,
+          26,
+          512,
+          240
+        ],
+        "mismatched_display_pixels": 0,
+        "completed": true,
+        "log_sha256": "9f1102dd6f3a847240d529eda1cf287a1739efcb21dead6799e6b069f71dfbbb",
+        "image_sha256": "58d894fb83c6b1f7b78f8e99aef7395e4699335b2c3ed6443799439809cc4ca8",
+        "scope": "PUAE synthetic sprite/Copper fixture, not full-game speed or physical Amiga validation",
+        "rom_sha256": "7f54f8d2ac18e5d922ddc4c4418f20217eb9a3cae4596dfef60fbe7898c5d4ec"
+      },
+      "compact": {
+        "renderer_eclock_ticks": 3218244,
+        "max_renderer_eclock_ticks": 67132,
+        "observed_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 6928,
+          "misses": 8432,
+          "oam_words": 43776
+        },
+        "percentiles": {
+          "p50": 49302,
+          "p95": 65105,
+          "p99": 67132
+        },
+        "variant": "compact",
+        "pictures": 64,
+        "expected_fnv32": 4042647880,
+        "crop": [
+          104,
+          26,
+          512,
+          240
+        ],
+        "mismatched_display_pixels": 0,
+        "completed": true,
+        "log_sha256": "4ca803f8df705b6d9351c81cde9d39d487359d6656124fb8b8c8e134d9fc8c70",
+        "image_sha256": "58d894fb83c6b1f7b78f8e99aef7395e4699335b2c3ed6443799439809cc4ca8",
+        "scope": "PUAE synthetic sprite/Copper fixture, not full-game speed or physical Amiga validation",
+        "rom_sha256": "4064cad7a54dde7932e925f327b4f3eebc05df453a08b9d084a943403afa56cd"
+      },
+      "rebuild": {
+        "renderer_eclock_ticks": 3307976,
+        "max_renderer_eclock_ticks": 64115,
+        "observed_fnv32": 4042647880,
+        "cache": {
+          "calls": 15360,
+          "hits": 0,
+          "misses": 15360,
+          "oam_words": 43776
+        },
+        "percentiles": {
+          "p50": 46845,
+          "p95": 62672,
+          "p99": 64115
+        },
+        "variant": "rebuild",
+        "pictures": 64,
+        "expected_fnv32": 4042647880,
+        "crop": [
+          104,
+          26,
+          512,
+          240
+        ],
+        "mismatched_display_pixels": 0,
+        "completed": true,
+        "log_sha256": "d4a5308d78028b3e279c32602e72c4da962f3ce88dd687c7512358ef18e4af62",
+        "image_sha256": "58d894fb83c6b1f7b78f8e99aef7395e4699335b2c3ed6443799439809cc4ca8",
+        "scope": "PUAE synthetic sprite/Copper fixture, not full-game speed or physical Amiga validation",
+        "rom_sha256": "fce0181d7daa8ea391d54a2fb8b7f1f4dd59486deaf9ff5829bcb98f178fde42"
+      }
+    },
+    "compact_aggregate_reduction_percent": 4.150436070537311,
+    "extraction": "Capture illegal word-write diagnostic log entries at 0xd00000\u20130xd0003a, mask each value to its low 16 bits and combine adjacent high/low words in big-endian order. Completion words are 0x534d at 0xd00000 and 5 at 0xd00002. Total/max/hash at offsets 0x10/0x14/0x18; cache calls/hits/misses/OAM words at 0x20/0x24/0x28/0x2c; p50/p95/p99 at 0x30/0x34/0x38.",
+    "oracle": "Reuses the independent first-eight/pixel model in vendor/tests/amiga/ar_sprite_expect.py without changing its FS-UAE mode. Checks all 64 sprite-plane states and the complete PUAE crop, including both horizontal copies.",
+    "scope": "Same-core synthetic renderer timing, with interrupts and display/Paula DMA; hashing is outside timed work. No full-game APU CPU synthesis in this fixture. No timing comparison with historical FS-UAE results or claim of physical hardware speed.",
+    "tail_tradeoff": "Forced rebuild has lower p50, p95 and maximum than compact caching in this fixture, although its aggregate cost is higher. Compact is not a universal per-call winner.",
+    "reusable_checker": "ports/little-league/tests/check_puae_sprite_capture.py",
+    "checker_negative_cases_passed": 8,
+    "diagnostic_sign_extension_check": "passed"
+  },
+  "target_player_diagnostics": {
+    "compact_2_mib_fast": {
+      "physical_fields": 9000,
+      "observed_payload_base": 2153680,
+      "source_frames_done": 4722,
+      "ppu_frame": 4723,
+      "original_rom_bytes_exact": true,
+      "game_ram_sha256": "8f904ad398cda0600fb684e330fe1afa347ca891dc92734cf2c5e3efe83f9bca",
+      "fast_bytes": 2097152,
+      "exit_code": 0,
+      "scope": "Expanded2MiB corrected compact no-input coldboot, not stock/fullspeed"
+    },
+    "compact_8_mib_fast": {
+      "physical_fields": 9000,
+      "observed_payload_base": 4248632,
+      "source_frames_done": 4721,
+      "ppu_frame": 4722,
+      "original_rom_bytes_exact": true,
+      "game_ram_sha256": "eb680894b3e711d9976ce17923579af20ff02fa37a12cd2e13b3aafc5f4e200b",
+      "fast_bytes": 8388608,
+      "exit_code": 0,
+      "scope": "Expanded8MiB corrected compact no-input coldboot, not stock/fullspeed"
+    },
+    "corrected_legacy_2_mib_fast": {
+      "physical_fields": 9000,
+      "observed_payload_base": 2153680,
+      "source_frames_done": 4688,
+      "ppu_frame": 4690,
+      "original_rom_bytes_exact": true,
+      "game_ram_sha256": "03c5e4a36c3d755321c2f5247ef06a4909227740ec57653f365fd8a3fa2bd2bb",
+      "fast_bytes": 2097152,
+      "exit_code": 0,
+      "scope": "Expanded2MiB interrupt-flag candidate no-input coldboot, not zero-Fast stock/full-speed acceptance"
+    },
+    "same_2_mib_fixed_endpoint_source_frame_gain": 34,
+    "same_2_mib_fixed_endpoint_gain_percent": 0.7252559726962458,
+    "scope": "No-input coldboot through 9000 physical PAL fields, including boot. These are bounded execution/payload checks, not steady-state full-speed benchmarks."
+  },
+  "memory": {
+    "legacy_runtime_fast_bytes": 1807840,
+    "compact_runtime_fast_bytes": 1808192,
+    "increase_bytes": 352,
+    "compact_text_bytes": 379536,
+    "legacy_text_bytes": 379172,
+    "chip_output_bytes": 1043848,
+    "compact_chip_boot_staging_bytes": 693248,
+    "scope": "Linked allocation sizes; loader/OS coexistence and physical expansion bus width remain separate."
+  },
+  "limits": [
+    "No zero-Fast-RAM acceptance. The original stock A1200 target remains unmet.",
+    "No physical hardware or complete-player full-speed/deadline/audio acceptance.",
+    "Interpreter fallbacks remain; translated routine coverage was not expanded by this renderer option.",
+    "Shared background-bitmap publication ownership was not redesigned; preserved existing writes and flush behavior.",
+    "Host C pixel equivalence, native state/PCM equivalence, and synthetic native Copper/pixel coverage are distinct checks, not one universal gameplay proof."
+  ],
+  "reproduction": {
+    "host": "python3 ports/little-league/tests/check_rowkey_storage.py --rom private-inputs/little-league-baseball.nes --frames 6000",
+    "native": "Use ports/little-league/native_check.py with the separate corrected rowkey ELF and preserved play_watchgame host states/PCM; 1222 and 6000 frames. Profile each variant with --frames 2200 --profile --first 1600 --last 2200.",
+    "fixture": "Import environment/headless-aga.py, override OUT to an isolated directory, call firmware(16,variant) for legacy/compact/rebuild, then run its custom ROM via a PAL cycle-exact PUAE .uae configuration with log_illegal_mem=true.",
+    "private_host_report": "build/little-league-corrected-rowkey/host-tests/run-20261111T002220Z-zibbkywc/result.json",
+    "private_native_evidence": "recovery-results/corrected-rowkey",
+    "private_target_evidence": "recovery-results/puae-sprite16-{legacy,compact,rebuild} and puae-expanded{2,8}m-9000-corrected-compact",
+    "fixture_checker": "python3 ports/little-league/tests/check_puae_sprite_capture.py --log /path/to/run.log --image /path/to/frame.ppm --variant legacy|compact|rebuild --output /path/to/capture-check.json"
+  }
+}
