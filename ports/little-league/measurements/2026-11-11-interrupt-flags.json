@@ -169,5 +169,7 @@
     "synthetic": "MUSASHI_DIR=/path/to/pinned/Musashi python3 -m unittest discover -s ports/little-league/tests -v",
     "native": "python3 ports/little-league/native_check.py --payload ports/little-league/vendor/build/smallmig-exact-interrupt-flags/llb.elf --states build/little-league-external-storage/host-tests/play_watchgame-external.states --musashi /path/to/pinned/Musashi --frames 6000 --state-output --diagnose-mismatches --pcm build/little-league-external-storage/host-tests/play_watchgame-external.pcm",
     "private_evidence_directory": "recovery-results/interrupt-flags"
-  }
+  },
+  "public_equivalent_base_commit": "abba0d4f9929376f0477b9ee22988da5126f11e2",
+  "source_base_tree": "66caf32248fe7fab5725cf97d217af2076305aea"
 }

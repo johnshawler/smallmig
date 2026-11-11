@@ -78,3 +78,9 @@ Guarded host rendering passes 107,982 picture comparisons across nine scripts an
 ### Interrupt-boundary correctness follow-up
 
 The memory figures and four oracle failures in the preceding section describe the earlier memory-only checkpoint. The subsequent translator fix preserves all status flags at each block entry, where a cycle-budget escape can service an interrupt. All 6,000 native checkpoints now match the host exactly, with unchanged PCM. Independent boundary tests fail before the fix and pass afterward. Current external-storage Fast reservation is 1,807,840 bytes, an increase of 23,696 bytes over that memory-only checkpoint; the CPU-only test uses about 1.64% more cycles. A separate 2 MiB Fast PAL coldboot still reaches gameplay. Neither full-speed nor zero-Fast acceptance is established. See `measurements/2026-11-11-interrupt-flags.json` for exact tests and the fixed-endpoint target comparison.
+
+### Corrected compact rendering and measured speed
+
+The existing `--compact-rowkey` option has now been requalified on the corrected native baseline. It retains exact native state/PCM and passes the guarded host and native sprite-fixture comparisons; defaults remain unchanged. See `measurements/2026-11-11-corrected-rowkey.json`.
+
+A separate no-input PAL 68020/2 MiB Chip + 2 MiB Fast interval, inferred from independent coldboots at fields 9,000 and 15,000, averages 25.79 source frames/second for compact versus 25.57 for corrected legacy. Compact reaches about 42.9% of the original 60.10 Hz game rate, not 100%. This is expanded-memory emulator evidence, not zero-Fast stock or physical-hardware acceptance. See `measurements/2026-11-11-postboot-speed.json` for exact settings, endpoints and limitations.

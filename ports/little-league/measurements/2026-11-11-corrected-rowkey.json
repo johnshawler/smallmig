@@ -538,5 +538,7 @@
     "private_native_evidence": "recovery-results/corrected-rowkey",
     "private_target_evidence": "recovery-results/puae-sprite16-{legacy,compact,rebuild} and puae-expanded{2,8}m-9000-corrected-compact",
     "fixture_checker": "python3 ports/little-league/tests/check_puae_sprite_capture.py --log /path/to/run.log --image /path/to/frame.ppm --variant legacy|compact|rebuild --output /path/to/capture-check.json"
-  }
+  },
+  "public_equivalent_base_commit": "da8b046f5ddc11466a8fc852ac6d4405527ecf79",
+  "source_base_tree": "fbf31fd059a7119cfab786855a0356d8f5001221"
 }
