@@ -87,6 +87,9 @@ extern ArHw ar_hw;
 #define AR_SPR(plane,row)     (ar_hw.spr  + (((unsigned)(plane)*240u+(row))*AR_STRIDE))
 #define AR_XPF1(plane,row)    (ar_hw.xpf1 + (((unsigned)(plane)*240u+(row))*AR_STRIDE))
 #define AR_XPF2(plane,row)    (ar_hw.xpf2 + (((unsigned)(plane)*240u+(row))*AR_STRIDE))
+/* AR_NO_STATIC requires caller-owned storage before the first ar_init. Keep
+ * it alive throughout rendering/DMA; do not rebind after initialization.
+ * The stage-2b player reserves AR_HW_BYTES + 4 for its final DMA pad. */
 void ar_hw_setmem(void *chip);          /* optional: place the buffers (AR_HW_BYTES, 4-byte aligned) in chip RAM; default: static arrays */
 #define AR_LAYB (4 + 4*240*AR_STRIDE)   /* one sprite / exact playfield block: 4 spare bytes in front (the display fetches a hidden pad word before row 0), then 4 planes x 240 rows */
 #define AR_HW_BYTES (AR_MAX_CFG*4*AR_BROWS*AR_BROW + 2*3*AR_LAYB)

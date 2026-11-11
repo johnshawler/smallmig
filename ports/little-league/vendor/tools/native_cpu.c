@@ -14,10 +14,12 @@ static uint64_t core_cycles;
 static uint64_t *profile, profile_time;
 static unsigned profile_pc,profile_first,profile_last;
 static int profile_active;
-static FILE *states;
+static FILE *states, *state_out;
+static unsigned mismatches;
+static int diagnose;
 static uint8_t record[4392];
 static int have_record;
-enum { TABS,INIT,ROM,RUN,RT,NES,AR_ENABLE,HW_ENABLE,FATAL,HOOK_INIT,HOOK_FRAME,HOOK_INPUT,LAYOUT,PCM_HASH,CACHE_STATS };
+enum { TABS,INIT,ROM,RUN,RT,NES,AR_ENABLE,HW_ENABLE,FATAL,HOOK_INIT,HOOK_FRAME,HOOK_INPUT,LAYOUT,PCM_HASH,CACHE_STATS,HW_SETMEM,HW_MEM,HW_BYTES,HW_EXPECTED };
 unsigned int m68k_read_memory_8(unsigned int a){ return mem[a&0xffffff]; }
 unsigned int m68k_read_memory_16(unsigned int a){ return (m68k_read_memory_8(a)<<8)|m68k_read_memory_8(a+1); }
 unsigned int m68k_read_memory_32(unsigned int a){ return (m68k_read_memory_16(a)<<16)|m68k_read_memory_16(a+2); }
@@ -32,6 +34,9 @@ static void next_record(void){
     if(n && n!=sizeof record){ fprintf(stderr,"Truncated state record\n"); exit(2); }
     have_record=(n==sizeof record);
 }
+static void write_state(const void *p,size_t n){
+    if(fwrite(p,1,n,state_out)!=n){perror("native state output");exit(2);}
+}
 static uint64_t le64(const uint8_t*p){ uint64_t v=0;for(int i=7;i>=0;i--)v=(v<<8)|p[i];return v; }
 static void hook(unsigned int pc){
     if(profile){
@@ -43,13 +48,28 @@ static void hook(unsigned int pc){
     if(pc==meta[HOOK_FRAME]){
         uint32_t sp=m68k_get_reg(NULL,M68K_REG_SP),f=m68k_read_memory_32(sp+4);
         frames++;
+        if(state_out){
+            uint8_t header[8];for(unsigned j=0;j<8;j++)header[j]=(uint8_t)((uint64_t)f>>(8*j));
+            write_state(header,8);
+            const unsigned lengths[4]={2048,256,32,2048};
+            for(unsigned j=0;j<4;j++){
+                unsigned field=m68k_read_memory_32(meta[LAYOUT]+4*(3+j));
+                write_state(mem+meta[NES]+field,lengths[j]);
+            }
+        }
         if(have_record && le64(record)==f){
             unsigned off[4]={8,2056,2312,2344},len[4]={2048,256,32,2048};
             const char*name[4]={"RAM","OAM","palette","nametables"};
             for(int i=0;i<4;i++){
                 unsigned field=m68k_read_memory_32(meta[LAYOUT]+4*(3+i));
                 if(memcmp(mem+meta[NES]+field,record+off[i],len[i])){
-                    fprintf(stderr,"Native mismatch: frame %u %s\n",f,name[i]); exit(5);
+                    mismatches++;
+                    if(mismatches<=16){
+                    fprintf(stderr,"Native mismatch: frame %u %s\n",f,name[i]);
+                    for(unsigned j=0;j<len[i];j++) if(mem[meta[NES]+field+j]!=record[off[i]+j])
+                        fprintf(stderr,"  offset %04x native %02x host %02x\n",j,mem[meta[NES]+field+j],record[off[i]+j]);
+                    }
+                    if(!diagnose) exit(5);
                 }
             }
             checked++; next_record();
@@ -75,7 +95,9 @@ int main(int argc,char**argv){
     if(argc!=6){fprintf(stderr,"usage: native_cpu payload.bin hooks.bin metadata.bin states.bin frames\n");return 2;}
     load(argv[1],0x200000);load(argv[2],0xa00000);
     FILE*f=fopen(argv[3],"rb");if(!f){perror(argv[3]);return 2;}
-    for(int i=0;i<=CACHE_STATS;i++){uint8_t b[4];if(fread(b,1,4,f)!=4)return 2;meta[i]=(uint32_t)b[0]<<24|(uint32_t)b[1]<<16|(uint32_t)b[2]<<8|b[3];}fclose(f);
+    for(int i=0;i<=HW_EXPECTED;i++){uint8_t b[4];if(fread(b,1,4,f)!=4)return 2;meta[i]=(uint32_t)b[0]<<24|(uint32_t)b[1]<<16|(uint32_t)b[2]<<8|b[3];}fclose(f);
+    diagnose=getenv("NATIVE_DIAGNOSE_MISMATCHES")!=NULL;
+    if(getenv("NATIVE_STATEOUT")){state_out=fopen(getenv("NATIVE_STATEOUT"),"wb");if(!state_out){perror("native state output");return 2;}}
     states=fopen(argv[4],"rb");if(!states){perror(argv[4]);return 2;}next_record();
     const char *profile_path=getenv("NATIVE_PROFILE");
     if(profile_path){
@@ -87,7 +109,17 @@ int main(int argc,char**argv){
     }
     m68k_init();m68k_set_cpu_type(M68K_CPU_TYPE_68020);m68k_set_instr_hook_callback(hook);
     m68k_write_memory_32(0,0x9ff000);m68k_write_memory_32(4,0x200000);m68k_pulse_reset();
+    if(meta[HW_MEM]<0x1000 || (meta[HW_MEM]&3) || meta[HW_BYTES]<8 ||
+       (meta[HW_BYTES]&3) || meta[HW_MEM]>=0x200000 ||
+       meta[HW_BYTES]>0x200000-meta[HW_MEM] ||
+       meta[HW_EXPECTED]<0xa00000 || meta[HW_EXPECTED]>sizeof mem-4 ||
+       meta[HW_BYTES]!=m68k_read_memory_32(meta[HW_EXPECTED]) ||
+       meta[HW_SETMEM]<0x200000 || meta[HW_SETMEM]>=0xa00000){
+        fprintf(stderr,"Invalid renderer storage metadata\n");return 2;
+    }
     call(meta[TABS],0,0);
+    /* Match display_init's ownership order before rt_init derives pointers. */
+    call(meta[HW_SETMEM],meta[HW_MEM],0);
     m68k_write_memory_32(meta[AR_ENABLE],1);m68k_write_memory_32(meta[HW_ENABLE],1);
     call(meta[INIT],meta[ROM],meta[ROM]+131072);call(meta[HOOK_INIT],0,0);
     unsigned layout=meta[LAYOUT];
@@ -108,6 +140,7 @@ int main(int argc,char**argv){
         for(int i=0;i<4;i++)printf("%s\"%s\":%u",i?",":"",keys[i],m68k_read_memory_32(meta[CACHE_STATS]+4*i));
         printf("}");
     }
-    printf("}\n");
-    return 0;
+    printf(",\"state_mismatches\":%u}\n",mismatches);
+    if(state_out && fclose(state_out)){perror("native state output close");return 2;}
+    return mismatches?5:0;
 }

@@ -1,0 +1,88 @@
+{
+  "scope": "Opt-in renderer allocation reduction on recovered older original-engine port; interpreter fallback remains. Not zero-Fast stock/full-speed acceptance.",
+  "exact_fast_before": 2755032,
+  "exact_fast_after": 1784144,
+  "saved_bytes": 970888,
+  "chip_bytes": 1043848,
+  "host_guarded": {
+    "scripts": 9,
+    "frames_per_script_per_variant": 6000,
+    "variants": 2,
+    "compared_pictures": 107982,
+    "both_layer_sets_observed": true,
+    "state_pcm_equal": true
+  },
+  "native": {
+    "native_frames": 6000,
+    "baseline_candidate_state_stream_identical": true,
+    "state_bytes": 26352000,
+    "state_sha256": "07605a2d3a118640241ec3b0a529a6fb953b588bbc069ee3e33c9ca4c0f85a70",
+    "native_pcm_fnv32": 1246956292,
+    "host_pcm_hash_matched": true,
+    "host_state_comparison_passed": false,
+    "host_state_differences": [
+      {
+        "frame": 1221,
+        "record_offset": 513,
+        "ram_offset": 505,
+        "native": 37,
+        "host": 36
+      },
+      {
+        "frame": 1924,
+        "record_offset": 503,
+        "ram_offset": 495,
+        "native": 36,
+        "host": 37
+      },
+      {
+        "frame": 2751,
+        "record_offset": 503,
+        "ram_offset": 495,
+        "native": 36,
+        "host": 37
+      },
+      {
+        "frame": 4545,
+        "record_offset": 503,
+        "ram_offset": 495,
+        "native": 37,
+        "host": 36
+      }
+    ],
+    "scope": "CPU-only functional comparison, not DMA/audio playback/speed acceptance"
+  },
+  "expanded2m_target": {
+    "physical_fields": 9000,
+    "observed_payload_base": 2153680,
+    "source_frames_done": 4816,
+    "ppu_frame": 4817,
+    "original_rom_bytes_exact": true,
+    "game_ram_sha256": "21cb3f5f566bf55fcf2921a4941f8887957c01f873987c0288200a33b5cae213",
+    "fast_bytes": 2097152,
+    "exit_code": 0,
+    "picture_equals_8m_candidate": true,
+    "scope": "Expanded2MiB candidate no-input coldboot, not zero-Fast stock/full-speed acceptance"
+  },
+  "expanded8m_target": {
+    "physical_fields": 9000,
+    "observed_payload_base": 4248632,
+    "source_frames_done": 4814,
+    "ppu_frame": 4815,
+    "original_rom_bytes_exact": true,
+    "game_ram_sha256": "84a995284f41f22dc02331d555f28a1711a94c396c614b427e3d3d9abee309e4",
+    "fast_bytes": 8388608,
+    "exit_code": 0,
+    "picture_equals_baseline": false,
+    "scope": "Expanded8MiB candidate no-input coldboot; no stock/fullspeed claim",
+    "game_ram_offset": 69878,
+    "layout_correction": "Recompiled with exact player AMIGA/PPU_FB5/audio flags; previous RAM hash used mismatched Nes layout. Frame counters unaffected."
+  },
+  "adf_sha256": "fb983bb59cb08560bda8b200e5319c1ca2dc1eab9d4d7aed38be67062b8bbe3e",
+  "limitations": [
+    "Native host-state oracle fails four pre-existing carry-bit stack differences; candidate matches baseline exactly.",
+    "No full-match, input-latency, Paula playback or physical-hardware acceptance.",
+    "Same physical-field endpoint does not mean same source-frame endpoint; no pixel-equivalence assertion between baseline and candidate at9000fields.",
+    "2MiBFast is separately verified expanded memory, not stock zeroFast."
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "date": "2026-11-11",
+  "scope": "Conservative interrupt-boundary flag correctness fix. CPU-only functional validation; not Amiga timing or zero-Fast-RAM acceptance.",
+  "source_base_commit": "5ac3f116d9f601d3d52f738cf2ddfe9293238d17",
+  "translator_sha256": "3a8ca07c3a33ed9698ba02279c5a8f29e10a2c33f742920fe1ffb2c4751b3c3f",
+  "musashi_commit": "313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd",
+  "change": "All tracked flags are live at every generated block entry, including its implicit rt_slow budget escape. Intra-block dead flag elimination remains enabled.",
+  "build": {
+    "artifact": "Little-League-Interrupt-Flags.adf",
+    "artifact_sha256": "2fc8eb702cc6a4dd10fd271c90bf0439c9f5e9aaa394f0710471f1a96a10368b",
+    "artifact_bytes": 901120,
+    "translated_blocks": 3147,
+    "environment": {
+      "PREFIX": "m68k-linux-gnu-",
+      "BUILD": "smallmig-exact-interrupt-flags",
+      "EXTRA": "-DAUDIO_EXACT -DAR_NO_STATIC",
+      "FASTRAM": "1",
+      "FAST_BASE": "0x200000",
+      "ARENDER_HW": "2",
+      "RELOCATE": "1",
+      "CACHE030": "0",
+      "CACHE040": "0",
+      "CACHE060": "0"
+    },
+    "translator_defaults": {
+      "XL_COALESCE_IO": "1",
+      "XL_DIRECT_IO": "1",
+      "XL_DIRECT_FIXED_IO": "0"
+    },
+    "compiler": "m68k-linux-gnu-gcc -m68020 -O2 (freestanding player build)",
+    "private_cartridge_required": true,
+    "binary_published": false
+  },
+  "validation": {
+    "short_native": {
+      "native_frames": 1222,
+      "checkpoints": 1222,
+      "pcm_fnv32": 141209669,
+      "core_cycles": 1104799560,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 0
+    },
+    "full_native": {
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "pcm_fnv32": 1246956292,
+      "core_cycles": 5693077302,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 0
+    },
+    "full_pcm_equals_host": true,
+    "baseline_native": {
+      "native_frames": 6000,
+      "checkpoints": 6000,
+      "pcm_fnv32": 1246956292,
+      "core_cycles": 5601418551,
+      "amiga_speed_certified": false,
+      "sprite_cache": {
+        "calls": 0,
+        "hits": 0,
+        "misses": 0,
+        "oam_words": 0
+      },
+      "state_mismatches": 4
+    },
+    "script": "ports/little-league/vendor/tools/discovery/inputs/play_watchgame.txt",
+    "changed_state_bytes_vs_baseline": [
+      {
+        "frame": 1221,
+        "ram_offset": "01f9",
+        "before": "25",
+        "after": "24"
+      },
+      {
+        "frame": 1924,
+        "ram_offset": "01ef",
+        "before": "24",
+        "after": "25"
+      },
+      {
+        "frame": 2751,
+        "ram_offset": "01ef",
+        "before": "24",
+        "after": "25"
+      },
+      {
+        "frame": 4545,
+        "ram_offset": "01ef",
+        "before": "25",
+        "after": "24"
+      }
+    ],
+    "other_state_byte_changes": 0,
+    "unit_tests": {
+      "passed": 11,
+      "native_boundary_tests": 4,
+      "native_boundary_cases": 7,
+      "analysis_codegen_tests": 4,
+      "storage_metadata_tests": 3
+    },
+    "existing_translator_suite": {
+      "programs": 1131,
+      "trials": 32,
+      "runs": 36192,
+      "failures": 0,
+      "XL_DIRECT_FIXED_IO": "1",
+      "QEMUFLAGS": "-cpu m68020 -one-insn-per-tb"
+    },
+    "runtime_branch_encoding_checks": "pass (all 8 debug-flag combinations)",
+    "pre_fix_liveness_regression_proof": {
+      "method": "Execute finalized tests with original liveness function substituted in memory; source files unchanged",
+      "failed_assertions": 10,
+      "errors": 0
+    },
+    "expanded_pal_2m_fast_coldboot": {
+      "physical_fields": 9000,
+      "observed_payload_base": 2153680,
+      "source_frames_done": 4688,
+      "ppu_frame": 4690,
+      "original_rom_bytes_exact": true,
+      "game_ram_sha256": "03c5e4a36c3d755321c2f5247ef06a4909227740ec57653f365fd8a3fa2bd2bb",
+      "fast_bytes": 2097152,
+      "exit_code": 0,
+      "scope": "Expanded2MiB interrupt-flag candidate no-input coldboot, not zero-Fast stock/full-speed acceptance",
+      "configuration": "PAL A1200, 2 MiB Chip + 2 MiB Fast, stock 68EC020 settings",
+      "gameplay_visual_check": "On-field gameplay observed in test screenshot",
+      "private_evidence": "recovery-results/puae-expanded2m-9000-interrupt-flags/inspection.json"
+    }
+  },
+  "tradeoffs": {
+    "core_cycle_delta": 91658751,
+    "core_cycle_delta_percent": 1.6363489027906424,
+    "core_cycle_scope": "CPU-only Musashi workload, not stock PAL A1200 wall-clock speed",
+    "text_bytes_before": 355488,
+    "text_bytes_after": 379172,
+    "runtime_fast_bytes_before": 1784144,
+    "runtime_fast_bytes_after": 1807840,
+    "chip_output_bytes": 1043848,
+    "boot_chip_staging_bytes": 692736,
+    "expanded_2m_fast_fixed_endpoint_comparison": {
+      "physical_fields": 9000,
+      "source_frames_before": 4816,
+      "source_frames_after": 4688,
+      "source_frame_delta": -128,
+      "source_frame_delta_percent": -2.6578073089700998,
+      "scope": "Emulated no-input coldboot through a fixed field endpoint, including boot. Not a steady-state speed benchmark or physical hardware measurement."
+    }
+  },
+  "limits": [
+    "Full-game native check compares RAM/OAM/palette/nametable checkpoints and exact PCM; it is not a physical Amiga speed or zero-Fast-RAM validation.",
+    "Synthetic native tests observe reconstructed P at rt_slow before the successor instruction; game-state comparisons verify the four previously differing interrupt stack bytes.",
+    "Exact original game PCs causing the four historical mismatches have not been individually traced.",
+    "Interpreter fallbacks still exist; translated coverage was not expanded by this fix.",
+    "The expanded 2 MiB Fast diagnostic reaches gameplay; no zero-Fast-RAM or full-speed stock-machine acceptance follows from it. The corrected candidate has not yet been rechecked with 8 MiB Fast in this record."
+  ],
+  "reproduction": {
+    "synthetic": "MUSASHI_DIR=/path/to/pinned/Musashi python3 -m unittest discover -s ports/little-league/tests -v",
+    "native": "python3 ports/little-league/native_check.py --payload ports/little-league/vendor/build/smallmig-exact-interrupt-flags/llb.elf --states build/little-league-external-storage/host-tests/play_watchgame-external.states --musashi /path/to/pinned/Musashi --frames 6000 --state-output --diagnose-mismatches --pcm build/little-league-external-storage/host-tests/play_watchgame-external.pcm",
+    "private_evidence_directory": "recovery-results/interrupt-flags"
+  },
+  "public_equivalent_base_commit": "abba0d4f9929376f0477b9ee22988da5126f11e2",
+  "source_base_tree": "66caf32248fe7fab5725cf97d217af2076305aea"
+}

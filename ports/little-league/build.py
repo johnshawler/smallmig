@@ -28,7 +28,7 @@ def build(args):
                    if all(shutil.which(p+t) for t in ('gcc', 'as', 'ld', 'nm', 'objcopy'))), None)
     if not prefix:
         raise SystemExit('Install m68k GCC and binutils before building.')
-    out = ROOT / 'build/little-league-original'
+    out = ROOT / ('build/little-league-external-storage' if args.external_renderer_storage else 'build/little-league-original')
     out.mkdir(parents=True, exist_ok=True)
     disk = out / ('Little-League-Original-Cue.adf' if args.cue_audio else 'Little-League-Original-Exact.adf')
     if args.wide_dma:
@@ -37,6 +37,9 @@ def build(args):
     env.update(PREFIX=prefix, BUILD='smallmig-cue' if args.cue_audio else 'smallmig-exact',
                EXTRA='' if args.cue_audio else '-DAUDIO_EXACT', FASTRAM='1', FAST_BASE='0x200000',
                ARENDER_HW='2', RELOCATE='1', CACHE030='0', CACHE040='0', CACHE060='0')
+    if args.external_renderer_storage:
+        env['BUILD'] += '-external-storage'
+        env['EXTRA'] += ' -DAR_NO_STATIC'
     if args.wide_dma:
         env['BUILD'] += '-wide'
         env['EXTRA'] += ' -DAR2_FETCH32'
@@ -52,11 +55,14 @@ def build(args):
     if len(data) != 901120:
         raise SystemExit('Unexpected ADF size')
     relocation = json.loads((HERE/'vendor/build'/env['BUILD']/'reloc.json').read_text())
+    map_name = ('memory-map'+env['BUILD'].removeprefix('smallmig')+'.json') if args.external_renderer_storage else 'memory-map.json'
+    report_name = ('build-report'+env['BUILD'].removeprefix('smallmig')+'.json') if args.external_renderer_storage else 'build-report.json'
     subprocess.run([sys.executable,str(HERE/'memory_map.py'),str(HERE/'vendor/build'/env['BUILD']/'llb.elf'),
-                    '--output',str(out/'memory-map.json')],check=True)
+                    '--output',str(out/map_name)],check=True)
     report = {'adf': disk.name, 'adf_bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
               'rom_sha256': ROM_SHA, 'target': 'PAL A1200, stock 68EC020, AGA, 2 MiB Chip + 8 MiB Fast',
-              'minimum_fast_capacity_mib':4,'memory_map':'memory-map.json',
+              'minimum_fast_capacity_mib':4,
+              'renderer_storage':'caller-owned Chip buffer only' if args.external_renderer_storage else 'caller-owned Chip buffer plus unused static fallback','memory_map':map_name,
               'source_gameplay_hz':60.0988,'presentation':'PAL vblank' if args.standard=='pal' else 'NTSC vblank',
               'sprite_row_identity':'experimental compact exact key' if args.compact_rowkey else 'legacy exact key',
               'runtime_fast_bytes': relocation['memory_bytes'], 'loader': 'allocates and relocates into available Fast RAM',
@@ -66,7 +72,7 @@ def build(args):
               'gameplay': 'original cartridge program, statically translated with interpreter fallback',
               'renderer': 'experimental 32-bit AGA DMA' if args.wide_dma else '16-bit AGA DMA',
               'acceptance': 'original-engine fidelity checks recorded; stock-speed hardware acceptance remains open'}
-    (out/'build-report.json').write_text(json.dumps(report, indent=2)+'\n')
+    (out/report_name).write_text(json.dumps(report, indent=2)+'\n')
     if args.kickstart:
         ks = Path(args.kickstart).expanduser().resolve()
         if not ks.is_file():
@@ -102,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--cue-audio', action='store_true', help='Diagnostic faster approximate sound mode')
     parser.add_argument('--wide-dma', action='store_true', help='Build the experimental 32-bit AGA DMA renderer')
     parser.add_argument('--compact-rowkey', action='store_true', help='Build the candidate cheaper exact sprite-row identity')
+    parser.add_argument('--external-renderer-storage', action='store_true', help='Candidate: omit unused renderer fallback; stage-2b player only')
     parser.add_argument('--two-player', action='store_true', help='Map player two to WASD, F and G in the FS-UAE profile')
     timing=parser.add_mutually_exclusive_group()
     timing.add_argument('--stock-timing', dest='stock_timing',action='store_true',help='Use stock CPU timing (default)')

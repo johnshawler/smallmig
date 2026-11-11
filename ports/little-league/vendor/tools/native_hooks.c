@@ -11,6 +11,7 @@ static AudioWords words;
 static uint64_t from;
 static int8_t pcm[1024];
 uint32_t native_pcm_hash;
+const uint32_t native_hw_storage_bytes = AR_HW_BYTES + 4;
 void native_init(void){
     aw_init(&words,11803,21423809u,39375000u,124);
     from=0;

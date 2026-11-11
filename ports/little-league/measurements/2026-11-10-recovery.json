@@ -1,0 +1,254 @@
+{
+  "source_commit": "8393b517b49d82137c37d0ef1a1a108254d072d7",
+  "source_branch": "little-league-playable",
+  "recovery_date_utc": "2026-11-10",
+  "scope": "Older durable source recovery plus a narrow assembler compatibility fix. Does not recover or certify later workspace-only native conversions.",
+  "source_fix": "Three short branches use a local alias colocated with exported rt_wr_gen; target ABI and short instruction encodings retained.",
+  "host_apu": {
+    "checks": 588,
+    "failed": 0
+  },
+  "host_graphics": {
+    "scripts": 9,
+    "source_frames_per_script": 6000,
+    "compared_frames_per_script": 5999,
+    "total_compared_frames": 53991,
+    "failed": 0
+  },
+  "native_translator": {
+    "programs": 1131,
+    "runs": 36192,
+    "failures": 0,
+    "cpu": "m68020",
+    "qemu_flags": "-cpu m68020 -one-insn-per-tb"
+  },
+  "branch_encodings": {
+    "passed": true,
+    "configurations": 8,
+    "checked_short_branches": 24,
+    "source_sha256": "8495d1a69de20a3691aa5863953b803ad6cfb4e22ba24fc4a5baab2a8fd63f80",
+    "assembler": "GNU assembler (GNU Binutils for Debian) 2.44",
+    "records": [
+      {
+        "flags": [],
+        "branches": [
+          {
+            "address": 414,
+            "opcode": "0x652c",
+            "target": 460
+          },
+          {
+            "address": 418,
+            "opcode": "0x6b28",
+            "target": 460
+          },
+          {
+            "address": 428,
+            "opcode": "0x671e",
+            "target": 460
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_TRACE"
+        ],
+        "branches": [
+          {
+            "address": 506,
+            "opcode": "0x655a",
+            "target": 598
+          },
+          {
+            "address": 510,
+            "opcode": "0x6b56",
+            "target": 598
+          },
+          {
+            "address": 520,
+            "opcode": "0x674c",
+            "target": 598
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_STATS"
+        ],
+        "branches": [
+          {
+            "address": 426,
+            "opcode": "0x652c",
+            "target": 472
+          },
+          {
+            "address": 430,
+            "opcode": "0x6b28",
+            "target": 472
+          },
+          {
+            "address": 440,
+            "opcode": "0x671e",
+            "target": 472
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_STATS",
+          "XRT_TRACE"
+        ],
+        "branches": [
+          {
+            "address": 518,
+            "opcode": "0x655a",
+            "target": 610
+          },
+          {
+            "address": 522,
+            "opcode": "0x6b56",
+            "target": 610
+          },
+          {
+            "address": 532,
+            "opcode": "0x674c",
+            "target": 610
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_CHECK"
+        ],
+        "branches": [
+          {
+            "address": 414,
+            "opcode": "0x6530",
+            "target": 464
+          },
+          {
+            "address": 422,
+            "opcode": "0x6b28",
+            "target": 464
+          },
+          {
+            "address": 432,
+            "opcode": "0x671e",
+            "target": 464
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_CHECK",
+          "XRT_TRACE"
+        ],
+        "branches": [
+          {
+            "address": 506,
+            "opcode": "0x655e",
+            "target": 602
+          },
+          {
+            "address": 514,
+            "opcode": "0x6b56",
+            "target": 602
+          },
+          {
+            "address": 524,
+            "opcode": "0x674c",
+            "target": 602
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_CHECK",
+          "XRT_STATS"
+        ],
+        "branches": [
+          {
+            "address": 426,
+            "opcode": "0x6530",
+            "target": 476
+          },
+          {
+            "address": 434,
+            "opcode": "0x6b28",
+            "target": 476
+          },
+          {
+            "address": 444,
+            "opcode": "0x671e",
+            "target": 476
+          }
+        ]
+      },
+      {
+        "flags": [
+          "XRT_CHECK",
+          "XRT_STATS",
+          "XRT_TRACE"
+        ],
+        "branches": [
+          {
+            "address": 518,
+            "opcode": "0x655e",
+            "target": 614
+          },
+          {
+            "address": 526,
+            "opcode": "0x6b56",
+            "target": 614
+          },
+          {
+            "address": 536,
+            "opcode": "0x674c",
+            "target": 614
+          }
+        ]
+      }
+    ],
+    "scope": "Assembly encoding/export validation, not Amiga execution or speed."
+  },
+  "repeated_build": {
+    "byte_identical": true,
+    "adf_sha256": "b40f6c298e1517d1a4a6ca5e9c3361490668aaf616900d3d64cbbf1bbcf45deb",
+    "adf_bytes": 901120
+  },
+  "memory": {
+    "runtime_fast_bytes": 2755032,
+    "minimum_fast_capacity_mib": 4,
+    "tested_fast_capacity_mib": 8,
+    "chip_capacity_mib": 2
+  },
+  "emulator_smoke": {
+    "passed_boot_smoke": true,
+    "physical_fields": 3000,
+    "observed_fast_capacity_bytes": 8388608,
+    "observed_payload_base": 4248632,
+    "original_rom_bytes_exact": true,
+    "source_frames_done": 1107,
+    "ppu_frame": 1108,
+    "game_ram_sha256": "253a1d83e8dfab04184a02bbaa6efdbc75b4119ef0dcf932b2113ea7e73a431e",
+    "frame_equals_pre_fix_capture": true,
+    "chip_ram_equals_pre_fix_capture": true,
+    "scope": "Observed recovered original-engine execution in PAL68020/2MiB Chip/8MiB Fast. Boot includes startup and is not a steady gameplay speed measurement. Frontend metadata ownership fix only.",
+    "game_ram_offset": 69878,
+    "layout_correction": "2026-11-11: recomputed with AMIGA player layout; former hash used host-only line-palette fields. Frame counters, artifact hashes and boot result unchanged."
+  },
+  "limitations": [
+    "No zero-Fast stock qualification for this recovered branch.",
+    "No new full-match, exact picture oracle, input-latency, continuous audio/DMA or physical-hardware acceptance.",
+    "Boot source-frame count is not steady-state game speed.",
+    "Current PUAE core differs from the later unavailable workspace and its results are not transferred.",
+    "Private ROM, firmware, generated ADF, RAM dumps and emulator captures are excluded from public source."
+  ],
+  "private_evidence_hashes": {
+    "recovery-results/host-check-6000.log": "79165d130d1b32446dc50810372153bc6475d618dced46415815c9ddb1e60e21",
+    "recovery-results/native-translator-unit.log": "c7bfabe0a26606c29670550345ad091b4cb00e22bcbb51c02c93e551c831bffc",
+    "recovery-results/build-expanded8m-fixed.log": "f18d78d65e3f46c0df73b9088cc6e072fe09328aec35dddc71250ea4a0afca25",
+    "recovery-results/build-expanded8m-repeat.log": "f18d78d65e3f46c0df73b9088cc6e072fe09328aec35dddc71250ea4a0afca25",
+    "recovery-results/puae-expanded8m-3000-v2/run.log": "25c8bd46cf34de4f896f6e99cb1fed0f21119d5337f11224293ce4853af18988"
+  }
+}

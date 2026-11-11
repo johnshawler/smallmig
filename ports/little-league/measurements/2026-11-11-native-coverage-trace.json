@@ -1,0 +1,443 @@
+{
+  "date": "2026-11-11",
+  "experiment": "Observe unknown-target and budget-edge execution without changing the game payload",
+  "source_test_baseline_commit": "c6ec738baa9b8c65cc14c143f4bbb2eda657158c",
+  "source_test_baseline_public_equivalent": "cb29a8e2b2133bda025eca2b3e7b59e5231795ce",
+  "source_test_baseline_tree_sha": "8e3d9ecf79f4af815529ccb11b7ffb7fdc20d0cd",
+  "scope": "Test-side Musashi instruction-hook observation only. No translator, game runtime, game ELF/bin, default-mode, or PR metadata change.",
+  "payload_sha256": "2c2ef4fb370a57306603859161409f010b8eae5c710504eed0ad69ab96577fdf",
+  "generated_code_sha256": "b585404f2730fa0b01c58f35f0e1a6b1cae445bbdc826a086bb74eced9481d1b",
+  "seen_sha256": "6ad7522d26f8edd84b0f7ec208225dbd553fe925daebcb23e95fb4ee5dfe965c",
+  "core_commit": "313ebf1bd9f4d0d93341eb5ce21fd8a119e9dbdd",
+  "window": {
+    "frame_window": [
+      1600,
+      2200
+    ],
+    "totals": {
+      "unknown_direct": 2,
+      "unknown_dispatch": 352,
+      "budget": 1800,
+      "step_budget": 7391,
+      "step_unknown": 603,
+      "nmi_budget": 600
+    },
+    "classifications": {
+      "unknown_direct:known_not_emitted": 2,
+      "unknown_dispatch:emitted_interior": 352,
+      "budget:native_entry": 1800,
+      "step_budget:native_entry": 3787,
+      "step_budget:emitted_interior": 3604,
+      "step_unknown:emitted_interior": 601,
+      "step_unknown:known_not_emitted": 2,
+      "nmi_budget:emitted_interior": 352,
+      "nmi_budget:native_entry": 248
+    },
+    "observed_unknown_keys": 46,
+    "direct_unknowns": [
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d91d",
+        "count": 1,
+        "classification": "known_not_emitted"
+      },
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d928",
+        "count": 1,
+        "classification": "known_not_emitted"
+      }
+    ],
+    "top_dispatch_misses": [
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "cc0c",
+        "count": 300,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e2f2",
+        "count": 4,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e331",
+        "count": 3,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a86f",
+        "count": 2,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a870",
+        "count": 2,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e2a8",
+        "count": 2,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e32c",
+        "count": 2,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 2,
+        "pc": "b5c2",
+        "count": 1,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 2,
+        "pc": "b5ce",
+        "count": 1,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 2,
+        "pc": "b5d7",
+        "count": 1,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "9852",
+        "count": 1,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a7ff",
+        "count": 1,
+        "classification": "emitted_interior"
+      }
+    ],
+    "compiled_layout": {
+      "nes_prg_lo": 14,
+      "nes_prg_hi": 18,
+      "rt_cpu": 0,
+      "cpu_pc": 0,
+      "nes_size": 71934,
+      "rt_size": 224,
+      "cpu_size": 8
+    }
+  },
+  "full": {
+    "frame_window": [
+      0,
+      6000
+    ],
+    "totals": {
+      "unknown_direct": 9,
+      "unknown_dispatch": 3758,
+      "budget": 17974,
+      "initial": 1,
+      "step_initial": 2,
+      "step_budget": 75551,
+      "step_unknown": 6398,
+      "nmi_budget": 5995
+    },
+    "classifications": {
+      "unknown_direct:known_not_emitted": 9,
+      "unknown_dispatch:emitted_interior": 3758,
+      "budget:native_entry": 17974,
+      "initial:native_entry": 1,
+      "step_initial:native_entry": 1,
+      "step_initial:emitted_interior": 1,
+      "step_budget:native_entry": 37255,
+      "step_budget:emitted_interior": 38296,
+      "step_unknown:emitted_interior": 6389,
+      "step_unknown:known_not_emitted": 9,
+      "nmi_budget:emitted_interior": 3602,
+      "nmi_budget:native_entry": 2393
+    },
+    "observed_unknown_keys": 358,
+    "direct_unknowns": [
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d91d",
+        "count": 2,
+        "classification": "known_not_emitted"
+      },
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d928",
+        "count": 2,
+        "classification": "known_not_emitted"
+      },
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d93d",
+        "count": 1,
+        "classification": "known_not_emitted"
+      },
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "d944",
+        "count": 3,
+        "classification": "known_not_emitted"
+      },
+      {
+        "event": "unknown_direct",
+        "bank": 7,
+        "pc": "e40a",
+        "count": 1,
+        "classification": "known_not_emitted"
+      }
+    ],
+    "top_dispatch_misses": [
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "cc0c",
+        "count": 2933,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 1,
+        "pc": "94aa",
+        "count": 156,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "c271",
+        "count": 81,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "c264",
+        "count": 11,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 4,
+        "pc": "b3a0",
+        "count": 10,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a86f",
+        "count": 10,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e2f2",
+        "count": 10,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "c167",
+        "count": 7,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e2f4",
+        "count": 7,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 7,
+        "pc": "e32f",
+        "count": 7,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a870",
+        "count": 6,
+        "classification": "emitted_interior"
+      },
+      {
+        "event": "unknown_dispatch",
+        "bank": 5,
+        "pc": "a872",
+        "count": 6,
+        "classification": "emitted_interior"
+      }
+    ],
+    "compiled_layout": {
+      "nes_prg_lo": 14,
+      "nes_prg_hi": 18,
+      "rt_cpu": 0,
+      "cpu_pc": 0,
+      "nes_size": 71934,
+      "rt_size": 224,
+      "cpu_size": 8
+    }
+  },
+  "validation": {
+    "window_2200_checkpoints_match": true,
+    "window_state_bytes_equal_uninstrumented": true,
+    "window_pcm_fnv32": 783789551,
+    "window_total_core_cycles": 1880848131,
+    "window_profile_json_byte_identical_to_uninstrumented": true,
+    "full_6000_checkpoints_match": true,
+    "full_state_bytes_equal_uninstrumented": true,
+    "full_pcm_reference_hash_matched": true,
+    "full_pcm_fnv32": 1246956292,
+    "full_core_cycles": 5481758829,
+    "full_result_json_equivalent_to_uninstrumented": true,
+    "regression_test_methods_passed": 15,
+    "new_rom_free_test_methods": 4,
+    "malformed_metadata_subcases_rejected": 4,
+    "hardened_origin_csv_identical_to_v2": true,
+    "synthetic_bypassing_indirect_classified_unknown_other": true
+  },
+  "findings": [
+    "All 3758 observed full-run dispatch misses target already-emitted block interiors, not untranslated routines.",
+    "Nine direct exits correspond to nine executions of five known omitted INC absolute,X instructions. No unseen or non-PRG interpreted PC was observed in this script.",
+    "The full dispatch histogram equals the interior pre-NMI next-PC histogram except for 156 additional dispatches to bank1:94AA. This is a histogram comparison, not a causal episode pairing.",
+    "Bank1:94AA is an already-emitted interior JSR; its additional dispatches are not attributed to NMI. Bank7:CC0C accounts for 2933 dispatch misses.",
+    "Observed budget-origin steps and unknown-origin steps are separate categories. Budget origin does not prove every individual interpreted step is unavoidable."
+  ],
+  "known_static_omissions": {
+    "decoded_seen_instructions": 16543,
+    "emitted_unique_instructions": 16536,
+    "omitted_instruction_count": 7,
+    "instruction": "INC absolute,X",
+    "locations": [
+      {
+        "bank": 4,
+        "pc": "ad0c",
+        "base": "071a"
+      },
+      {
+        "bank": 7,
+        "pc": "d91d",
+        "base": "073a"
+      },
+      {
+        "bank": 7,
+        "pc": "d928",
+        "base": "0757"
+      },
+      {
+        "bank": 7,
+        "pc": "d93d",
+        "base": "0742"
+      },
+      {
+        "bank": 7,
+        "pc": "d944",
+        "base": "0738"
+      },
+      {
+        "bank": 7,
+        "pc": "e40a",
+        "base": "0793"
+      },
+      {
+        "bank": 7,
+        "pc": "ef24",
+        "base": "073e"
+      }
+    ],
+    "reason": "Current indexed native RAM operands do not mask the post-add effective address, so possible 2 KiB mirror crossings conservatively use the interpreter.",
+    "next_test_plan": "Before any translator change, test INC-only RAM-range eligibility, all X values for the seven actual bases and mirror boundaries, seven-cycle RMW semantics, old/new writes, NZ results and unchanged C/V/registers, open-bus/trace contract, and budget/NMI edges. Do not widen generic is_ram_operand or change conservative I/O termination."
+  },
+  "instrumentation_contract": {
+    "episode_origins": [
+      "xrt_enter",
+      "rt_slow budget escape",
+      "aliased rt_unk/rt_unk_ent unknown escape"
+    ],
+    "unknown_origin_split": "Predecessor inside the ELF-derived rt_disp address range means unknown_dispatch. Outside it, only an absolute-long JMP (opcode 4EF9) whose decoded target equals rt_unk proves unknown_direct; all other predecessors are unknown_other. No unknown_other event occurred in these measured runs.",
+    "mapped_bank": "Read current prg_lo or prg_hi for every recorded event, using m68k-compiled offsetof metadata. Non-PRG PCs get a separate sentinel class.",
+    "interpreter_pc": "At cpu_step, validate the ABI argument pointer equals Rt.cpu, then read Cpu6502.pc through compiled offsets. cpu_nmi observations read the pre-interrupt next-PC.",
+    "classification": "ELF block labels identify entries; generated code.s instruction comments identify emitted interiors; seen_abs identifies known-but-unemitted addresses. These do not prove full-cartridge coverage.",
+    "metadata_guards": "Versioned sidecar, code/layout bounds, overflow-safe structure-offset bounds, dispatch ordering, actual CPU argument pointer, mapped PRG alignment/range.",
+    "host_histogram_allocation_bytes": 51904512,
+    "default": "Disabled unless --coverage is explicitly selected; coverage environment variables are cleared otherwise."
+  },
+  "limits": [
+    "Only play_watchgame is traced here. Earlier nine-script functional native qualification remains separate.",
+    "No claim that all routines or all reachable cartridge instructions are native. Seven known static omissions and intentional interpreter budget service remain.",
+    "No automatic addition of interior block leaders: this can increase guard overhead or change detected waiting-loop behavior.",
+    "CPU-only observations are not full-player timing, DMA/bus contention, audio-continuity or physical-hardware acceptance.",
+    "Known/unseen labels use conventional low-bank and fixed-bank7 generated address mappings. All observed rows use these mappings; alternate MMC1 window mappings are not qualified by this classifier."
+  ],
+  "reproduction": {
+    "window": "python3 ports/little-league/native_check.py --payload build/little-league-native-coverage/compact-trace-v3/llb.elf --states /path/to/play_watchgame-compact.states --musashi /path/to/pinned/Musashi --frames 2200 --coverage --profile --first 1600 --last 2200 --state-output",
+    "full": "python3 ports/little-league/native_check.py --payload build/little-league-native-coverage/compact-trace-v3/llb.elf --states /path/to/play_watchgame-compact.states --pcm /path/to/play_watchgame-compact.pcm --musashi /path/to/pinned/Musashi --frames 6000 --coverage --first 0 --last 6000 --state-output",
+    "rom_free_tests": "python3 ports/little-league/tests/test_native_coverage_hooks.py -v",
+    "all_tests": "MUSASHI_DIR=/path/to/pinned/Musashi python3 -m unittest discover -s ports/little-league/tests -v"
+  },
+  "private_artifacts": {
+    "window": "build/little-league-original/native-check/compact-trace-v3-2200-profile-1600-2200-coverage-1600-2200",
+    "full": "build/little-league-original/native-check/compact-trace-v3-6000-coverage-0-6000",
+    "window_coverage_sha256": "3c0140cd4881e2657dd7212e459084674eb647e76640220e6735a43685a8eea1",
+    "full_coverage_sha256": "2f980c00cb30243e7feb232986976451684723030ca3f0f6090e6faa17a57521",
+    "logs": "recovery-results/native-coverage-trace",
+    "window_raw_hashes": {
+      "coverage.csv": "476b43f012d63992295a54b69acaa0a711a94b37fe5d15a14a8e5364ffa059df",
+      "native-states.bin": "3334b3867e685fb78daaf711673fe89926334d93e358acdd8ea5fc592774e74f",
+      "result.json": "946c1bb46c0c5cbd151150384471cf8612a00d710b75708cdf924819597c89f9",
+      "coverage-metadata.bin": "88281adbccc134474d572aa8da4c3d522821d842b1780ac1eaaa7da2c7f7eb06",
+      "hooks.elf": "4db5f30afdaeded08e524f62933f46ad423b115aa64d85c0b23cfec9a8414fac",
+      "hooks.bin": "3d6065f7b7fc03bc8df70141848ea4f716d24e728e7a48321bf6eadbc1406297",
+      "native-cpu": "1407ee3022303e9aeca57742137d0e84ce17721112db3f3f6577cd17a4ee5cde",
+      "profile.json": "9f13f1e2a250de82024701a7c353bfe6b5a2aa6d0672b110bd56cc62c4c98b91"
+    },
+    "full_raw_hashes": {
+      "coverage.csv": "c181d90f40432d4873a745555dd7b96d88a51a9d687788f333e9c6e0e725cf0c",
+      "native-states.bin": "40dace7509e495aaaad197c9a054444cf441793dcddf46c3f16bde35ad5b23f9",
+      "result.json": "f6f4891296cbb70cae5c43040a0e518c1f8e700db7031554823acf64c50947f5",
+      "coverage-metadata.bin": "88281adbccc134474d572aa8da4c3d522821d842b1780ac1eaaa7da2c7f7eb06",
+      "hooks.elf": "4db5f30afdaeded08e524f62933f46ad423b115aa64d85c0b23cfec9a8414fac",
+      "hooks.bin": "3d6065f7b7fc03bc8df70141848ea4f716d24e728e7a48321bf6eadbc1406297",
+      "native-cpu": "1407ee3022303e9aeca57742137d0e84ce17721112db3f3f6577cd17a4ee5cde"
+    }
+  },
+  "payload_elf_sha256": "ad00a2b4fce728386d2321b1dbeb11cf8177ffb23ca08f5693300b10feb2a984",
+  "payload_sources": {
+    "elf": "build/little-league-native-coverage/compact-trace-v3/llb.elf",
+    "bin": "build/little-league-native-coverage/compact-trace-v3/llb.bin",
+    "generated_code": "build/little-league-native-coverage/compact-trace-v3/code.s",
+    "seen": "ports/little-league/vendor/translator/seen_abs.txt",
+    "seen_version": "Unchanged tracked file at source_test_baseline_commit; hash recorded above."
+  }
+}

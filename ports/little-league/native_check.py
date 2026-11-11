@@ -29,11 +29,28 @@ def symbols(path, prefix):
     return result
 
 
+def renderer_storage(game, sized_symbols):
+    """Reject malformed/mismatched ELF storage before running native code."""
+    address = game['hwmem']
+    size = sized_symbols['hwmem']
+    start, end = game['_chip_start'], game['_chip_end']
+    # The player allocates AR_HW_BYTES + 4. Check the object, not a guessed
+    # neighboring symbol. Preserve its DMA pad and reject low-memory aliases.
+    if address & 3 or size < 8 or size & 3 or not 0x1000 <= start <= address < end <= 0x200000 or size > end-address:
+        raise ValueError('Invalid native renderer Chip storage bounds/alignment')
+    if not 0x200000 <= game['ar_hw_setmem'] < game['_load_end']:
+        raise ValueError('Renderer setter outside loaded payload')
+    return [game['ar_hw_setmem'], address, size]
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--payload', required=True, type=Path, help='Existing private llb.elf, with patched llb.bin beside it')
     p.add_argument('--states', required=True, type=Path, help='Host STATEOUT checkpoints for the same input script')
     p.add_argument('--musashi', required=True, type=Path, help='Musashi C source directory')
+    p.add_argument('--state-output', action='store_true', help='Record private native RAM/OAM/palette/nametable checkpoints')
+    p.add_argument('--diagnose-mismatches', action='store_true', help='Continue collecting mismatches; still fail on any difference')
+    p.add_argument('--wide-dma', action='store_true', help='Match an AR2_FETCH32 payload layout')
     p.add_argument('--frames', type=int, default=6000)
     p.add_argument('--profile', action='store_true', help='Attribute independent-core cycles to native functions')
     p.add_argument('--first', type=int, default=1600)
@@ -63,6 +80,8 @@ def main():
     (out/'testinput.inc').write_text('\n'.join(lines)+'\n')
     flags = ['-m68020', '-ffreestanding', '-nostdlib', '-fno-pic', '-O2', '-DAMIGA', '-DPPU_FB5',
              '-I'+str(SRC/'platform-a1200/freestanding'), '-I'+str(out)]
+    if a.wide_dma:
+        flags.append('-DAR2_FETCH32')
     subprocess.run([prefix+'gcc', *flags, '-c', str(SRC/'tools/native_hooks.c'), '-o', str(out/'hooks.o')], check=True)
     undefined = subprocess.check_output([prefix+'nm', '-u', str(out/'hooks.o')], text=True)
     defs = []
@@ -78,6 +97,13 @@ def main():
     names = ['tabs_expand','rt_init','rom_start','xrt_run','rt','nes','ppu_ar_enable','ar_hw_enable','rt_fatal']
     addresses = [game[n] for n in names] + [hooks[n] for n in ['native_init','native_frame','native_input','native_layout','native_pcm_hash']]
     addresses.append(game.get('ar_sprite_cache_stats',0))
+    sizes = {}
+    for line in subprocess.check_output([prefix+'nm', '-S', str(a.payload)], text=True).splitlines():
+        fields = line.split()
+        if len(fields) == 4:
+            sizes[fields[3]] = int(fields[1], 16)
+    addresses.extend(renderer_storage(game, sizes))
+    addresses.append(hooks['native_hw_storage_bytes'])
     (out/'metadata.bin').write_bytes(struct.pack('>'+str(len(addresses))+'I', *addresses))
     data = a.states.read_bytes()
     if len(data) % 4392:
@@ -92,13 +118,17 @@ def main():
     # Generate opcode handlers in this run's own directory, without modifying the dependency.
     subprocess.run([cc, '-O2', str(musashi/'m68kmake.c'), '-o', str(out/'m68kmake')], check=True)
     subprocess.run([str(out/'m68kmake'), str(out), str(musashi/'m68k_in.c')], check=True)
-    subprocess.run([cc, '-O2', '-I'+str(out), '-I'+str(musashi), str(SRC/'tools/native_cpu.c'),
+    subprocess.run([cc, '-O2', '-DM68K_INSTRUCTION_HOOK=1', '-I'+str(out), '-I'+str(musashi), str(SRC/'tools/native_cpu.c'),
                     str(musashi/'m68kcpu.c'), str(out/'m68kops.c'), str(musashi/'softfloat/softfloat.c'),
                     '-lm', '-o', str(out/'native-cpu')], check=True)
     log = out/'result.log'
     env=os.environ.copy()
-    for key in ('NATIVE_PROFILE','NATIVE_PROFILE_FIRST','NATIVE_PROFILE_LAST'):
+    for key in ('NATIVE_PROFILE','NATIVE_PROFILE_FIRST','NATIVE_PROFILE_LAST','NATIVE_STATEOUT','NATIVE_DIAGNOSE_MISMATCHES'):
         env.pop(key,None)
+    if a.state_output:
+        env['NATIVE_STATEOUT']=str(out/'native-states.bin')
+    if a.diagnose_mismatches:
+        env['NATIVE_DIAGNOSE_MISMATCHES']='1'
     if a.profile:
         env.update(NATIVE_PROFILE=str(out/'profile.csv'),NATIVE_PROFILE_FIRST=str(a.first),NATIVE_PROFILE_LAST=str(a.last))
     with log.open('w') as stream:
@@ -106,6 +136,8 @@ def main():
                                  str(out/'hooks.bin'), str(out/'metadata.bin'), str(out/'states.bin'), str(a.frames)],
                                 stdout=stream, stderr=subprocess.STDOUT, timeout=1800,env=env)
     print(log.read_text(), end='')
+    if a.state_output and (out/'native-states.bin').stat().st_size != a.frames*4392:
+        raise SystemExit('Incomplete native state output')
     if result.returncode:
         raise SystemExit(result.returncode)
     report = json.loads(log.read_text().splitlines()[-1])
