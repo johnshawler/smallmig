@@ -68,3 +68,9 @@ linked addresses unless a running relocated base was supplied to `memory_map.py`
 ## November 10 source recovery
 
 See [recovery results](RECOVERY-2026-11-10.md) for the reproducible older-source build, assembler compatibility fix, fresh bounded tests and remaining limits. This does not restore later workspace-only native conversions.
+
+## Recovered memory-reduction candidate (November 11)
+
+`--external-renderer-storage` omits the unused fallback renderer allocation only in the native stage-2b player. Candidate files stay under `build/little-league-external-storage/`; baseline files remain unchanged. Exact Fast reservation drops from 2,755,032 to 1,784,144 bytes, while Chip reservation remains 1,043,848 bytes. A separately configured PAL A1200 test with 2 MiB Fast reaches on-field gameplay after 9,000 fields. The generated profile conservatively remains 8 MiB Fast. This is not zero-Fast stock or full-speed acceptance.
+
+Guarded host rendering passes 107,982 picture comparisons across nine scripts and both buffer sets. Native baseline/candidate state streams are identical for 6,000 frames and PCM matches the host. Both builds still fail the host state oracle on four pre-existing carry-bit differences in stack RAM; no full native-oracle pass is claimed. See `measurements/2026-11-11-external-storage.json`.

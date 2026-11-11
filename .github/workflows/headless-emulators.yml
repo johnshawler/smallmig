@@ -57,3 +57,5 @@ jobs:
         run: XL_DIRECT_FIXED_IO=1 make -C tests/xlunit TRIALS=32 QEMUFLAGS='-cpu m68020 -one-insn-per-tb'
       - name: Check runtime short-branch encodings
         run: python3 ports/little-league/tests/check_rt_x_branches.py
+      - name: Check native renderer storage metadata
+        run: python3 ports/little-league/tests/test_native_storage_metadata.py
